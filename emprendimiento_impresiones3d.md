@@ -29,8 +29,6 @@
 
 Describe cómo surgió la idea o la oportunidad que dio origen a la iniciativa.
 
-## Nuestra historia
-
 La idea surgió de un grupo de amigos estudiantes de diseño e ingeniería que, para un proyecto universitario, necesitaban desarrollar un modelo en 3D que además debía ser impreso.
 
 Durante el proceso se dieron cuenta de que acceder a una impresora 3D no era sencillo. Y, cuando encontraban un lugar donde imprimir, los costos solían ser bastante elevados.

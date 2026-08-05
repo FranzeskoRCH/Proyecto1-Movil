@@ -2,7 +2,7 @@ Registro de entrevista
 
 Información del equipo
 
-Nombre del equipo:
+Nombre del equipo: Grupo 6
 
 Integrantes: Nicolás Muvdi, Daniel Gómez, Jose Ballestas, Francesco Rosa
 

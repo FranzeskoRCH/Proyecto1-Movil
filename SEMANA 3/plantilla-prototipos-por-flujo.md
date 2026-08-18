@@ -5,9 +5,13 @@
 
 ## Información del equipo
 
-**Nombre del equipo:**
+**Nombre del equipo:** Grupo 6
 
 **Integrantes:**
+- Jose Ballestas
+- Daniel Gomez
+- Nicolas Muvdi
+- Francesco Rosa
 
 ---
 
@@ -153,136 +157,3 @@ Repitan esta estructura para cada flujo priorizado. Si el equipo trabaja solo 2 
 
 ---
 
-## Flujo 3
-
-**Nombre del flujo:**
-
-**¿Qué quiere lograr el usuario en este flujo?**
-
-### Versión A: paso a paso
-
-1. El usuario...
-2. Luego...
-3. Después...
-4. Finalmente...
-
-### Versión A: pantallas o momentos clave
-
-1.
-2.
-3.
-4.
-
-### Versión B: paso a paso
-
-1. El usuario...
-2. Luego...
-3. Después...
-4. Finalmente...
-
-### Versión B: pantallas o momentos clave
-
-1.
-2.
-3.
-4.
-
-### Evidencia en Figma
-
-**Enlace versión A:**
-
-**Enlace versión B:**
-
-### Resultado de la validación exploratoria
-
-**¿Con quién se probó este flujo?**
-
-**¿Qué reacción generó la versión A?**
-
-- 
-- 
-- 
-
-**¿Qué reacción generó la versión B?**
-
-- 
-- 
-- 
-
-### Versión seleccionada para la semana 4
-
-**Versión elegida:**
-
-**¿Por qué?**
-
-- 
-- 
-- 
-
----
-
-## Flujo 4
-
-**Nombre del flujo:**
-
-**¿Qué quiere lograr el usuario en este flujo?**
-
-### Versión A: paso a paso
-
-1. El usuario...
-2. Luego...
-3. Después...
-4. Finalmente...
-
-### Versión A: pantallas o momentos clave
-
-1.
-2.
-3.
-4.
-
-### Versión B: paso a paso
-
-1. El usuario...
-2. Luego...
-3. Después...
-4. Finalmente...
-
-### Versión B: pantallas o momentos clave
-
-1.
-2.
-3.
-4.
-
-### Evidencia en Figma
-
-**Enlace versión A:**
-
-**Enlace versión B:**
-
-### Resultado de la validación exploratoria
-
-**¿Con quién se probó este flujo?**
-
-**¿Qué reacción generó la versión A?**
-
-- 
-- 
-- 
-
-**¿Qué reacción generó la versión B?**
-
-- 
-- 
-- 
-
-### Versión seleccionada para la semana 4
-
-**Versión elegida:**
-
-**¿Por qué?**
-
-- 
-- 
-- 

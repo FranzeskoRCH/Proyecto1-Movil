@@ -2,49 +2,48 @@
 
 ## Información del equipo
 
-**Nombre del equipo:**
+**Nombre del equipo:** Grupo 6
 
 **Integrantes:**
+- Jose Ballestas
+- Daniel Gomez
+- Nicolas Muvdi
+- Francesco Rosa
 
 ---
 
 ## Flujos seleccionados
 
-Registren los flujos que el equipo decidió trabajar esta semana.
-
 ### Flujo 1
 
-**Nombre del flujo:**
+**Nombre del flujo:** Crear y publicar un proyecto
 
 **¿Por qué merece prioridad?**
 
+Este flujo merece prioridad porque permite que los estudiantes conviertan una idea en una propuesta concreta dentro de la plataforma. A través de este flujo pueden explicar
+su proyecto, definir qué necesitan para desarrollarlo e indicar las habilidades o perfiles de otras carreras que podrían complementar el equipo.
+
+Además, este flujo es fundamental para generar oportunidades de colaboración dentro de la plataforma, ya que los demás estudiantes necesitan conocer los proyectos y sus
+necesidades para poder encontrar uno en el que puedan participar.
+
 **¿Qué pasaría si este flujo no funciona bien?**
+
+Si este flujo no funciona bien, los estudiantes podrían tener dificultades para presentar sus ideas o indicar qué perfiles necesitan. Esto podría generar proyectos poco
+claros y dificultar que otros estudiantes encuentren oportunidades en las que puedan aportar sus habilidades.
 
 ### Flujo 2
 
-**Nombre del flujo:**
+**Nombre del flujo:** Explorar proyectos publicados
 
 **¿Por qué merece prioridad?**
 
-**¿Qué pasaría si este flujo no funciona bien?**
-
-### Flujo 3
-
-**Nombre del flujo:**
-
-**¿Por qué merece prioridad?**
+Este flujo merece prioridad porque permite que los estudiantes encuentren proyectos relacionados con sus habilidades, intereses y conocimientos. Es una parte esencial de la
+propuesta de valor de la plataforma, ya que facilita la conexión entre estudiantes de diferentes carreras que pueden complementar sus conocimientos.
 
 **¿Qué pasaría si este flujo no funciona bien?**
 
-### Flujo 4
-
-**Nombre del flujo:**
-
-**¿Por qué merece prioridad?**
-
-**¿Qué pasaría si este flujo no funciona bien?**
-
-> Si el equipo solo trabaja 2 o 3 flujos, puede dejar vacío el último.
+Si este flujo no funciona bien, los estudiantes podrían no encontrar proyectos relevantes o tener dificultades para identificar dónde pueden aportar sus habilidades. Esto
+reduciría las posibilidades de formar equipos multidisciplinares y limitaría el propósito principal de la plataforma.
 
 ---
 
@@ -60,11 +59,14 @@ Registren los flujos que el equipo decidió trabajar esta semana.
 
 Expliquen brevemente:
 
-- 
+- Seleccionamos estos flujos porque representan las dos necesidades principales de nuestros usuarios: proponer un proyecto y encontrar un proyecto en el que puedan aportar
+sus habilidades.
 
-- 
+- Ambos flujos tienen un impacto directo en el objetivo de la plataforma, que es conectar estudiantes de diferentes carreras para formar equipos con habilidades
+complementarias.
 
-- 
+- Priorizamos estos flujos porque todavía existe incertidumbre sobre cuál es la mejor manera de ayudar a los estudiantes a presentar sus necesidades y encontrar proyectos
+compatibles. Por eso, son buenos flujos para explorar mediante prototipos de baja resolución.
 
 ---
 
@@ -96,36 +98,6 @@ Expliquen brevemente:
 - Versión B
 
 ### Flujo 2
-
-**¿Qué aprendieron al comparar las dos versiones de este flujo?**
-
-- 
-
-- 
-
-- 
-
-**¿Qué versión pasa a la semana 4?**
-
-- Versión A
-- Versión B
-
-### Flujo 3
-
-**¿Qué aprendieron al comparar las dos versiones de este flujo?**
-
-- 
-
-- 
-
-- 
-
-**¿Qué versión pasa a la semana 4?**
-
-- Versión A
-- Versión B
-
-### Flujo 4
 
 **¿Qué aprendieron al comparar las dos versiones de este flujo?**
 

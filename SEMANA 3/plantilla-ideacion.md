@@ -65,7 +65,7 @@ hacen falta para desarrollar cada proyecto, facilitando la formación de equipos
 
 ### Flujo 2
 
-**Nombre del flujo:** Explorar proyecto publicados
+**Nombre del flujo:** Explorar proyectos publicados
 
 **¿Qué quiere lograr el usuario en este flujo?**
 

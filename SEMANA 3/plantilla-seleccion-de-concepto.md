@@ -74,43 +74,45 @@ compatibles. Por eso, son buenos flujos para explorar mediante prototipos de baj
 
 ¿Con quién validaron los prototipos de baja resolución?
 
-- Usuario potencial
-- Compañero
-- Otro:
+Validamos los prototipos de baja resolución con un usuario potencial y con compañeros de clase.
 
 ¿Cuántas personas participaron en total?
 
-**Cantidad:**
+**Cantidad:** 3 personas (2 compañeros de otras ingenierías y 1 usuario potencial).
 
 ### Flujo 1
 
 **¿Qué aprendieron al comparar las dos versiones de este flujo?**
 
-- 
+- Los usuarios valoraron mucho el lenguaje nativo en español en la versiona A y la pantalla de revisión final ("Revisa tu proyecto"), la cual les dio mayor seguridad antes
+de dar el paso definitivo de publicar. Además, la barra de navegación inferior facilitó la orientación global dentro de la app.
 
-- 
+- El flujo en tres pasos (Step 1, Step 2, Step 3) fue calificado como muy limpio y directo, pero la presencia de términos en inglés en la version B (New Proposal, Short
+Description) generó cierta desconexión en usuarios que preferían una interfaz 100% en su idioma local.
 
-- 
+- En ambas versiones se apreció la inclusión de etiquetas/chips para seleccionar las carreras/perfiles buscados, pero en la Versión A la clasificación por áreas
+(Tecnología, Diseño, Negocios, Salud, Ciencias, Ingeniería) resultó más completa e intuitiva.
 
 **¿Qué versión pasa a la semana 4?**
 
 - Versión A
-- Versión B
 
 ### Flujo 2
 
 **¿Qué aprendieron al comparar las dos versiones de este flujo?**
 
-- 
+- La presencia del indicador explícito de coincidencia en la version A (95% Match, 88% Match) fue el elemento más elogiado por los usuarios, ya que les permite saber de un
+vistazo rápido qué proyectos se alinean mejor con su perfil sin tener que leer cada descripción a fondo.
 
-- 
+- Solicitar al usuario que configure primero su perfil en la version B antes de mostrar los proyectos demostró agregar un paso de fricción inicial. Varios participantes
+prefirieron poder explorar primero las iniciativas disponibles antes de decidir registrar sus datos.
 
-- 
+- En la vista de detalle del proyecto, la Versión A brinda mayor claridad sobre la composición del equipo actual y el estado de los perfiles buscados (Asignado / Buscando)
+superando a la pantalla de éxito simple de la Versión B.
 
 **¿Qué versión pasa a la semana 4?**
 
 - Versión A
-- Versión B
 
 ---
 
@@ -118,17 +120,20 @@ compatibles. Por eso, son buenos flujos para explorar mediante prototipos de baj
 
 ¿Qué flujos y qué versiones pasan a la semana 4?
 
+Pasan a la semana 4 el Flujo 1 (Crear y publicar un proyecto) en su Versión A y el Flujo 2 (Explorar proyectos publicados) en su Versión A.
+
 ---
 
 ## Razones de la decisión
 
 ¿Por qué estas decisiones parecen las mejores para avanzar después de la validación exploratoria?
 
-- 
+- La Versión A de ambos flujos demostró una mejor adopción al estar completamente contextualizada en español y alineada al lenguaje del estudiante universitario local.
 
-- 
+- El sistema de porcentaje de compatibilidad (Match%) en la exploración reduce de forma significativa el tiempo de búsqueda y aumenta el interés por postularse a proyectos.
 
-- 
+- El flujo de creación en la Versión A transmite más confianza al usuario gracias al resumen editable previo a la publicación (Revisa tu proyecto) y a la barra de
+navegación que mantiene al usuario ubicado dentro de la aplicación.
 
 ---
 
@@ -136,11 +141,9 @@ compatibles. Por eso, son buenos flujos para explorar mediante prototipos de baj
 
 ¿Qué cosas siguen sin estar claras y deben validarse mejor en la semana 4?
 
-- 
+- Validar cómo recibe el creador del proyecto la solicitud cuando otro estudiante presiona "Solicitar unirme", y qué canal se utilizará para que se pongan en contacto.
 
-- 
-
-- 
+- Evaluar si es necesario permitir que un estudiante explore proyectos sin necesidad de ingresar previamente su carrera y habilidades en la pantalla de filtro.
 
 ---
 
@@ -148,8 +151,10 @@ compatibles. Por eso, son buenos flujos para explorar mediante prototipos de baj
 
 Completen las frases:
 
-`Creemos que los usuarios valorarán...`
+Creemos que los usuarios valorarán visualizar de manera transparente el porcentaje de compatibilidad (Match%) y el estado actual de los vacantes (Buscando / Asignado) antes
+de enviar su solicitud a un proyecto.
 
-`Creemos que los usuarios usarán esta solución porque...`
+Creemos que los usuarios usarán esta solución porque facilita la creación de equipos interdisciplinarios al permitirles filtrar propuestas según sus habilidades e
+intereses específicos en pocos clics.
 
-`Sabremos que vamos por buen camino si...`
+Sabremos que vamos por buen camino si los usuarios identifican proyectos de su interés de manera veloz y valoran el proceso de postulación como rápido y claro.

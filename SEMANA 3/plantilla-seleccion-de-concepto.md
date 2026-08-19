@@ -78,41 +78,35 @@ Validamos los prototipos de baja resolución con un usuario potencial y con comp
 
 ¿Cuántas personas participaron en total?
 
-**Cantidad:** 3 personas (2 compañeros de otras ingenierías y 1 usuario potencial).
+**Cantidad:** 4 personas (2 compañeros de otras ingenierías y 2 usuarios potenciales de otras disciplinas).
 
 ### Flujo 1
 
 **¿Qué aprendieron al comparar las dos versiones de este flujo?**
 
-- Los usuarios valoraron mucho el lenguaje nativo en español en la versiona A y la pantalla de revisión final ("Revisa tu proyecto"), la cual les dio mayor seguridad antes
-de dar el paso definitivo de publicar. Además, la barra de navegación inferior facilitó la orientación global dentro de la app.
+- La interfaz tipo etiquetas/tags de la Versión B hizo que la selección de perfiles requeridos fuera más fluida e intuitiva, superando la rigidez de las casillas de la Versión A.
 
-- El flujo en tres pasos (Step 1, Step 2, Step 3) fue calificado como muy limpio y directo, pero la presencia de términos en inglés en la version B (New Proposal, Short
-Description) generó cierta desconexión en usuarios que preferían una interfaz 100% en su idioma local.
+- La opción directa de "Share Link" al finalizar la publicación en la Versión B resultó muy útil para los usuarios, ya que facilita la difusión inmediata del proyecto en canales externos.
 
-- En ambas versiones se apreció la inclusión de etiquetas/chips para seleccionar las carreras/perfiles buscados, pero en la Versión A la clasificación por áreas
-(Tecnología, Diseño, Negocios, Salud, Ciencias, Ingeniería) resultó más completa e intuitiva.
+- La navegación paso a paso y la pantalla de resumen final para editar secciones (procedentes de la Versión A) fueron fundamentales para transmitir seguridad al usuario antes de publicar.
 
 **¿Qué versión pasa a la semana 4?**
 
-- Versión A
+- Versión B
 
 ### Flujo 2
 
 **¿Qué aprendieron al comparar las dos versiones de este flujo?**
 
-- La presencia del indicador explícito de coincidencia en la version A (95% Match, 88% Match) fue el elemento más elogiado por los usuarios, ya que les permite saber de un
-vistazo rápido qué proyectos se alinean mejor con su perfil sin tener que leer cada descripción a fondo.
+- El paso inicial de definir habilidades (Set Up Profile) en la Versión B fue valorado por dar seguridad sobre el porqué de las recomendaciones, aunque se debe balancear con la capacidad de explorar libremente sin fricción.
 
-- Solicitar al usuario que configure primero su perfil en la version B antes de mostrar los proyectos demostró agregar un paso de fricción inicial. Varios participantes
-prefirieron poder explorar primero las iniciativas disponibles antes de decidir registrar sus datos.
+- Las tarjetas de proyecto con el indicador explícito de vacantes disponibles (spots open) en la Versión B ayudaron a los usuarios a tomar decisiones mucho más rápidas.
 
-- En la vista de detalle del proyecto, la Versión A brinda mayor claridad sobre la composición del equipo actual y el estado de los perfiles buscados (Asignado / Buscando)
-superando a la pantalla de éxito simple de la Versión B.
+- La pantalla final de confirmación ("Your request has been sent!") de la Versión B fue esencial para dar tranquilidad al postulante, mientras que el cálculo de % Match de la Versión A sigue siendo el elemento de mayor valor para filtrar proyectos.
 
 **¿Qué versión pasa a la semana 4?**
 
-- Versión A
+- Versión B
 
 ---
 
@@ -120,7 +114,7 @@ superando a la pantalla de éxito simple de la Versión B.
 
 ¿Qué flujos y qué versiones pasan a la semana 4?
 
-Pasan a la semana 4 el Flujo 1 (Crear y publicar un proyecto) en su Versión A y el Flujo 2 (Explorar proyectos publicados) en su Versión A.
+Pasan a la semana 4 el Flujo 1 (Crear y publicar un proyecto) en su Versión B y el Flujo 2 (Explorar proyectos publicados) en su Versión B.
 
 ---
 
@@ -128,12 +122,11 @@ Pasan a la semana 4 el Flujo 1 (Crear y publicar un proyecto) en su Versión A y
 
 ¿Por qué estas decisiones parecen las mejores para avanzar después de la validación exploratoria?
 
-- La Versión A de ambos flujos demostró una mejor adopción al estar completamente contextualizada en español y alineada al lenguaje del estudiante universitario local.
+- La decisión de basar el desarrollo en la Versión B (enriquecida con elementos de la A) garantiza que la interfaz sea moderna, sintética y altamente funcional mediante el uso de tags y visibilidad de vacantes.
+  
+- La incorporación del idioma español, el resumen editable (Revisa tu proyecto) y la navegación de la Versión A asegura que la herramienta esté perfectamente contextualizada al lenguaje y a las necesidades de seguridad del estudiante universitario local.
 
-- El sistema de porcentaje de compatibilidad (Match%) en la exploración reduce de forma significativa el tiempo de búsqueda y aumenta el interés por postularse a proyectos.
-
-- El flujo de creación en la Versión A transmite más confianza al usuario gracias al resumen editable previo a la publicación (Revisa tu proyecto) y a la barra de
-navegación que mantiene al usuario ubicado dentro de la aplicación.
+- El sistema de porcentaje de compatibilidad (Match%) integrado a la estructura ágil de la Versión B aumenta el interés por postularse a proyectos, combinando lo mejor de ambos mundos.
 
 ---
 

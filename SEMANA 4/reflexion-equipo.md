@@ -28,7 +28,7 @@
 
 ¿Qué parte de la idea fue más difícil convertir en prototipo?
 
-Lo más complejo fue representar el funcionamiento dinámico del algoritmo de *% Match* en un prototipo interactivo de Figma. Mostrar de forma convincente cómo la configuración previa de las habilidades del usuario influye directamente en la compatibilidad de cada proyecto requirió diseñar estados y pantallas específicas que simularan esa personalización en tiempo real sin contar con un *backend* funcional.
+Lo más complejo fue representar el funcionamiento dinámico del algoritmo de *% Match* en un prototipo de Figma. Mostrar de forma convincente cómo la configuración previa de las habilidades del usuario influye directamente en la compatibilidad de cada proyecto requirió diseñar estados y pantallas específicas que simularan esa personalización en tiempo real sin contar con un *backend* funcional.
 
 ---
 

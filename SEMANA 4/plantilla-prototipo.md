@@ -97,7 +97,7 @@ Enumeren los elementos que van a construir y cómo se conectan entre sí.
 
 **Herramienta esperada:** Figma
 
-Si usan algún apoyo adicional, indíquenlo aquí:
+Si usan algún apoyo adicional, indíquenlo aquí: No
 
 ---
 
@@ -117,7 +117,7 @@ Si usan algún apoyo adicional, indíquenlo aquí:
 
 Peguen aquí el enlace al archivo o prototipo de Figma:
 
-**Enlace:** 
+**Enlace:** https://www.figma.com/design/kzlWc4SxUTsPEmwCHRlkVo/Flujos?node-id=1669-162202&t=sm3l64dj7JAV27Cs-1
 
 ¿Qué puede recorrer o ver una persona dentro de ese prototipo?
 

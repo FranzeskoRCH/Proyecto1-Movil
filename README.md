@@ -4,4 +4,4 @@
 - Jose Ballestas - @JandoBR
 - Daniel Gomez - @mariskit
 - Nicolas Muvdi - @Muvdi1805
-- Francesco Rosa - @FRanzeskoRCH
+- Francesco Rosa - @FranzeskoRCH

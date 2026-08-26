@@ -1,7 +1,7 @@
 **Nombre del equipo:** Grupo 6
 
 **Integrantes:**
-- Jose Ballestas
-- Daniel Gomez
-- Nicolas Muvdi
-- Francesco Rosa
+- Jose Ballestas - @JandoBR
+- Daniel Gomez - @mariskit
+- Nicolas Muvdi - @Muvdi1805
+- Francesco Rosa - @FRanzeskoRCH

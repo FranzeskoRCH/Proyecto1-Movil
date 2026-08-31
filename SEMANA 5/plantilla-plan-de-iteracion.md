@@ -34,7 +34,7 @@ Clasifiquen los cambios propuestos.
 
 - Resaltar claramente las etiquetas de habilidades (*skills*) y roles solicitados en las tarjetas del feed principal.
 
-- 
+
 
 ### Cambios importantes
 
@@ -42,7 +42,7 @@ Clasifiquen los cambios propuestos.
 
 - Habilitar un botón de confirmación o cancelación inmediata tras enviar una postulación.
 
-- 
+
 
 ### Ideas para más adelante
 
@@ -50,7 +50,7 @@ Clasifiquen los cambios propuestos.
 
 - Integrar la opción de vincular portafolios externos (GitHub, LinkedIn, Behance) en el perfil de cada integrante.
 
-- 
+
 
 ---
 

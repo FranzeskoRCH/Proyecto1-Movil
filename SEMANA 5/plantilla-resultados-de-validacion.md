@@ -53,8 +53,3 @@ Escriban un párrafo de 8 a 12 líneas respondiendo esta pregunta:
 A lo largo de este proceso, el equipo aprendió que diseñar una solución real exige poner a prueba las suposiciones teóricas frente a las reacciones genuinas de los usuarios antes de escribir una sola línea de código. Entendimos que la intuición inicial del desarrollador suele omitir pequeños detalles de usabilidad que resultan críticos para la experiencia del estudiante, como la necesidad de confirmaciones visuales explícitas o la preferencia por la búsqueda basada en etiquetas y afinidades. Prototipar de forma integrada nos demostró que una interfaz atractiva no sirve si los flujos no resuelven la incertidumbre del usuario al interactuar con el sistema. Esta etapa nos enseñó a priorizar las funciones que de verdad aportan valor, a descartar complejidades innecesarias y a encarar la fase de implementación técnica con una arquitectura visual y lógica sólida, ahorrando tiempo y reduciendo drásticamente el margen de error.
 ¿Qué problemas siguen presentes?
 
-- 
-
-- 
-
-- 

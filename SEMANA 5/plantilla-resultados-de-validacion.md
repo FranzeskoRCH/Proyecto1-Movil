@@ -30,7 +30,7 @@ Describan brevemente la versión del prototipo que mostraron en esta nueva valid
 
 Se probó la versión ajustada e integrada de media fidelidad del prototipo en Figma, la cual unifica los flujos de creación/publicación de proyectos y de búsqueda/postulación. Esta versión incorporó la interfaz traducida al español, sugerencias automáticas de etiquetas (*tags*) para habilidades, tarjetas de proyecto con porcentaje de afinidad (*% Match*) dinámico y mensajes de confirmación explícitos al finalizar cada acción.
 
-**Enlace al prototipo en Figma:** https://www.figma.com/design/kzlWc4SxUTsPEmwCHRlkVo/Flujos?node-id=2604-213&t=a2ImBOOhEMBHdglx-1
+**Enlace al prototipo en Figma:** https://www.figma.com/design/kzlWc4SxUTsPEmwCHRlkVo/Flujos?node-id=2604-213
 
 ¿Qué cambios importantes incorporaron desde la semana 4?
 

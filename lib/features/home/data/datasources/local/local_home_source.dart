@@ -1,4 +1,5 @@
 import '../../../domain/models/collaborator_profile.dart';
+import '../../../domain/models/enrolled_project.dart';
 import '../i_home_source.dart';
 
 /// Fuente de datos activa mientras no exista backend.
@@ -11,9 +12,14 @@ class LocalHomeSource implements IHomeSource {
 
   @override
   Future<CollaboratorProfile> getCollaboratorProfile() async {
-    // Simula la latencia de una petición real.
-    await Future.delayed(const Duration(milliseconds: 600));
     return CollaboratorProfile.fromJson(_profileJson);
+  }
+
+  @override
+  Future<List<EnrolledProject>> getEnrolledProjects() async {
+    return _enrolledProjectsJson
+        .map(EnrolledProject.fromJson)
+        .toList(growable: false);
   }
 
   // ---------------------------------------------------------------------------
@@ -23,7 +29,28 @@ class LocalHomeSource implements IHomeSource {
     'name': 'Sarah',
     'avatarUrl': 'https://i.pravatar.cc/150?img=47',
     'career': 'Ciencias de la Computación + Diseño Sostenible',
-    'skills': ['React Native', 'Figma', 'Data Analysis', 'Figma', 'Figma', 'Figma', 'Figma'],
-    'interests': ['Tecnología', 'Medio Ambiente', 'Arte y Diseño', 'Figma', 'Figma', 'Figma'],
+    'skills': ['React Native', 'Figma', 'Data Analysis'],
+    'interests': ['Tecnología', 'Medio Ambiente', 'Arte y Diseño'],
   };
+
+  static const List<Map<String, dynamic>> _enrolledProjectsJson = [
+    {
+      'id': 'a1',
+      'title': 'EcoCampus Sorter',
+      'description':
+          'Una estación de clasificación con IA enfocada en plástico y residuos de comercio para maximizar los flujos de reciclaje directo.',
+      'authorName': 'Kira Vance',
+      'authorAvatarUrl': 'https://i.pravatar.cc/150?img=47',
+      'role': 'Diseño UI/UX',
+    },
+    {
+      'id': 'a2',
+      'title': 'MedAlert Smart Watch',
+      'description':
+          'Monitorea biométricos de baja latencia para detectar emergencias en centros de atención a adultos mayores.',
+      'authorName': 'Marcos Chen',
+      'authorAvatarUrl': 'https://i.pravatar.cc/150?img=15',
+      'role': 'Investigación Biomédica',
+    },
+  ];
 }

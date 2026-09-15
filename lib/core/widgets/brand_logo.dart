@@ -33,7 +33,8 @@ class BrandLogo extends StatelessWidget {
           child: CircleAvatar(
             radius: 22,
             backgroundColor: const Color(0xFFEADFD6),
-            backgroundImage: NetworkImage(avatarUrl),
+            backgroundImage:
+                avatarUrl.isEmpty ? null : NetworkImage(avatarUrl),
           ),
         ),
       ],

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../../../core/widgets/brand_logo.dart';
 import '../viewmodels/home_controller.dart';
 import '../widgets/action_card_row.dart';
-import '../widgets/brand_logo.dart';
+import '../widgets/enrolled_project_card.dart';
 import '../widgets/greeting_header.dart';
-import '../widgets/profile_card.dart';
 
 /// Contenido de la pestaña "Inicio".
 ///
@@ -25,7 +25,7 @@ class HomePage extends StatelessWidget {
 
   static const String _subtitle =
       'Encuentra tu próximo proyecto interdisciplinario.';
-  static const String _title = 'Tu Perfil de Colaborador';
+  static const String _projectsTitle = 'Proyectos en los que participas';
 
   @override
   Widget build(BuildContext context) {
@@ -57,7 +57,7 @@ class HomePage extends StatelessWidget {
           ),
           const SizedBox(height: 28),
           const Text(
-            _title,
+            _projectsTitle,
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w700,
@@ -65,8 +65,17 @@ class HomePage extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 14),
-          ProfileCard(profile: profile),
-          const SizedBox(height: 24),
+          if (controller.enrolledProjects.isEmpty)
+            const Text(
+              'Aún no participas en ningún proyecto.',
+              style: TextStyle(fontSize: 13.5, color: Color(0xFF9E9E9E)),
+            )
+          else
+            for (final project in controller.enrolledProjects) ...[
+              EnrolledProjectCard(project: project),
+              const SizedBox(height: 14),
+            ],
+          const SizedBox(height: 10),
         ],
       );
     });

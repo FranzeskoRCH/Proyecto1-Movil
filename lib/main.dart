@@ -3,8 +3,10 @@ import 'package:get/get.dart';
 import 'package:loggy/loggy.dart';
 
 import 'core/app_theme.dart';
+import 'features/explore/explore_dependencies.dart';
 import 'features/home/home_dependencies.dart';
 import 'features/home/ui/views/main_shell.dart';
+import 'features/project/project_dependencies.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -12,6 +14,8 @@ void main() async {
   Loggy.initLoggy(logPrinter: const PrettyPrinter(showColors: true));
 
   registerHome();
+  registerExplore();
+  registerProject();
 
   runApp(const MyApp());
 }

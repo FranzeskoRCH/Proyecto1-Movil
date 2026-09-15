@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-/// Etiqueta tipo píldora reutilizable.
+/// Etiqueta tipo píldora reutilizable entre features.
 class TagChip extends StatelessWidget {
   const TagChip({
     super.key,

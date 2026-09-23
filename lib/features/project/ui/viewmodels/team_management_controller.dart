@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 import 'package:loggy/loggy.dart';
 
+import '../../domain/models/application_status.dart';
 import '../../domain/models/created_project.dart';
 import '../../domain/repositories/i_project_repository.dart';
 
@@ -41,6 +42,7 @@ class TeamManagementController extends GetxController with UiLoggy {
     await _run(
       applicantId,
       () => repository.acceptApplicant(project.id, applicantId),
+      newStatus: ApplicationStatus.accepted,
     );
   }
 
@@ -50,6 +52,7 @@ class TeamManagementController extends GetxController with UiLoggy {
     await _run(
       applicantId,
       () => repository.rejectApplicant(project.id, applicantId),
+      newStatus: ApplicationStatus.rejected,
     );
   }
 
@@ -59,18 +62,41 @@ class TeamManagementController extends GetxController with UiLoggy {
     await _run(
       applicantId,
       () => repository.removeMember(project.id, applicantId),
+      isRemove: true,
     );
   }
 
   Future<void> _run(
     String applicantId,
-    Future<void> Function() action,
-  ) async {
+    Future<void> Function() action, {
+    ApplicationStatus? newStatus,
+    bool isRemove = false,
+  }) async {
     if (_processingId.value != null) return;
     _processingId.value = applicantId;
     try {
       await action();
-      _project.refresh();
+      final current = _project.value;
+      if (current != null) {
+        if (isRemove) {
+          current.applicants.removeWhere(
+            (a) => a.id == applicantId || a.collaboratorId == applicantId,
+          );
+        } else if (newStatus != null) {
+          for (final a in current.applicants) {
+            if (a.id == applicantId || a.collaboratorId == applicantId) {
+              a.status = newStatus;
+            }
+          }
+        }
+        _project.refresh();
+
+        // Sincronizar con el backend
+        try {
+          final refreshed = await repository.getCreatedProjectById(current.id);
+          _project.value = refreshed;
+        } catch (_) {}
+      }
     } catch (exception) {
       loggy.error(
         'TeamManagementController: Error updating applicant: $exception',
@@ -80,3 +106,4 @@ class TeamManagementController extends GetxController with UiLoggy {
     }
   }
 }
+

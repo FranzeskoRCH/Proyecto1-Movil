@@ -9,6 +9,7 @@ import 'project_role.dart';
 class Project {
   Project({
     required this.id,
+    this.authorId = '',
     required this.title,
     required this.description,
     required this.vision,
@@ -25,6 +26,7 @@ class Project {
   });
 
   String id;
+  String authorId;
   String title;
 
   /// Descripción corta mostrada en la tarjeta de la lista.
@@ -48,6 +50,7 @@ class Project {
 
   factory Project.fromJson(Map<String, dynamic> json) => Project(
         id: json['id'] as String,
+        authorId: (json['authorId'] ?? json['author_id'] ?? '') as String,
         title: json['title'] as String,
         description: json['description'] ?? '',
         vision: json['vision'] ?? '',
@@ -70,6 +73,7 @@ class Project {
 
   Map<String, dynamic> toJson() => {
         'id': id,
+        'authorId': authorId,
         'title': title,
         'description': description,
         'vision': vision,

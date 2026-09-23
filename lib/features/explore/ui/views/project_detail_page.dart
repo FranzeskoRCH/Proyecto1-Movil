@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../../../core/roble_service.dart';
 import '../../../../core/widgets/section_label.dart';
 import '../../../../core/widgets/tag_chip.dart';
 import '../viewmodels/project_detail_controller.dart';
@@ -128,11 +129,18 @@ class _ProjectDetailPageState extends State<ProjectDetailPage> {
                         .toList(),
                   ),
                   const SizedBox(height: 28),
-                  _JoinButton(
-                    alreadyRequested: project.requestedToJoin,
-                    isSubmitting: controller.isSubmitting,
-                    onTap: _onJoinPressed,
-                  ),
+                  Builder(builder: (_) {
+                    final currentUserId =
+                        RobleService().currentUserId;
+                    final isOwner = project.authorId.isNotEmpty &&
+                        project.authorId == currentUserId;
+                    if (isOwner) return const _OwnerBadge();
+                    return _JoinButton(
+                      alreadyRequested: project.requestedToJoin,
+                      isSubmitting: controller.isSubmitting,
+                      onTap: _onJoinPressed,
+                    );
+                  }),
                 ],
               ),
             ),
@@ -143,6 +151,39 @@ class _ProjectDetailPageState extends State<ProjectDetailPage> {
   }
 }
 
+// ── Badge mostrado al creador del proyecto ─────────────────────────────────
+class _OwnerBadge extends StatelessWidget {
+  const _OwnerBadge();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 54,
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        color: const Color(0xFFF0F0F0),
+        borderRadius: BorderRadius.circular(30),
+      ),
+      child: const Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.star_rounded, size: 20, color: Color(0xFFFFAA00)),
+          SizedBox(width: 8),
+          Text(
+            'Eres el creador de este proyecto',
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w700,
+              color: Color(0xFF6B6B6B),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ── Botón de solicitud ───────────────────────────────────────────────────────
 class _JoinButton extends StatelessWidget {
   const _JoinButton({
     required this.alreadyRequested,

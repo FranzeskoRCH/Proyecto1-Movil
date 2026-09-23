@@ -24,65 +24,72 @@ class ExploreProjectsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final ExploreController controller = Get.find();
 
-    return ListView(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-      children: [
-        BrandLogo(avatarUrl: avatarUrl, onAvatarTap: onProfileTap),
-        const SizedBox(height: 18),
-        Obx(
-          () => FilterChipRow(
-            categories: controller.categories,
-            selected: controller.selectedCategory,
-            onSelected: controller.selectCategory,
+    return RefreshIndicator(
+      color: const Color(0xFFFF7043),
+      onRefresh: () => controller.loadProjects(),
+      child: ListView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+        children: [
+          BrandLogo(avatarUrl: avatarUrl, onAvatarTap: onProfileTap),
+          const SizedBox(height: 18),
+          Obx(
+            () => FilterChipRow(
+              categories: controller.categories,
+              selected: controller.selectedCategory,
+              onSelected: controller.selectCategory,
+            ),
           ),
-        ),
-        const SizedBox(height: 18),
-        Obx(() {
-          if (controller.isLoading && controller.projects.isEmpty) {
-            return const Padding(
-              padding: EdgeInsets.only(top: 60),
-              child: Center(child: CircularProgressIndicator()),
-            );
-          }
-
-          if (controller.error != null && controller.projects.isEmpty) {
-            return Padding(
-              padding: const EdgeInsets.only(top: 60),
-              child: Center(
-                child: Text(
-                  controller.error!,
-                  style: const TextStyle(color: Color(0xFF6B6B6B)),
+          const SizedBox(height: 18),
+          Obx(() {
+            if (controller.isLoading && controller.projects.isEmpty) {
+              return const Padding(
+                padding: EdgeInsets.only(top: 60),
+                child: Center(
+                  child: CircularProgressIndicator(color: Color(0xFFFF7043)),
                 ),
-              ),
-            );
-          }
+              );
+            }
 
-          if (controller.projects.isEmpty) {
-            return const Padding(
-              padding: EdgeInsets.only(top: 60),
-              child: Center(
-                child: Text(
-                  'No hay proyectos para esta categoría.',
-                  style: TextStyle(color: Color(0xFF6B6B6B)),
+            if (controller.error != null && controller.projects.isEmpty) {
+              return Padding(
+                padding: const EdgeInsets.only(top: 60),
+                child: Center(
+                  child: Text(
+                    controller.error!,
+                    style: const TextStyle(color: Color(0xFF6B6B6B)),
+                  ),
                 ),
-              ),
-            );
-          }
+              );
+            }
 
-          return Column(
-            children: [
-              for (final project in controller.projects) ...[
-                ProjectCard(
-                  project: project,
-                  onViewProject: () =>
-                      Get.to(() => ProjectDetailPage(projectId: project.id)),
+            if (controller.projects.isEmpty) {
+              return const Padding(
+                padding: EdgeInsets.only(top: 60),
+                child: Center(
+                  child: Text(
+                    'No hay proyectos para esta categoría.',
+                    style: TextStyle(color: Color(0xFF6B6B6B)),
+                  ),
                 ),
-                const SizedBox(height: 16),
+              );
+            }
+
+            return Column(
+              children: [
+                for (final project in controller.projects) ...[
+                  ProjectCard(
+                    project: project,
+                    onViewProject: () =>
+                        Get.to(() => ProjectDetailPage(projectId: project.id)),
+                  ),
+                  const SizedBox(height: 16),
+                ],
               ],
-            ],
-          );
-        }),
-      ],
+            );
+          }),
+        ],
+      ),
     );
   }
 }

@@ -41,42 +41,71 @@ class HomePage extends StatelessWidget {
         return const Center(child: Text('No se pudo cargar el perfil.'));
       }
 
-      return ListView(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-        children: [
-          BrandLogo(
-            avatarUrl: profile.avatarUrl,
-            onAvatarTap: onProfileTap,
-          ),
-          const SizedBox(height: 16),
-          GreetingHeader(name: profile.name, subtitle: _subtitle),
-          const SizedBox(height: 20),
-          ActionCardRow(
-            onCreateTap: onCreateTap,
-            onExploreTap: onExploreTap,
-          ),
-          const SizedBox(height: 28),
-          const Text(
-            _projectsTitle,
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w700,
-              color: Color(0xFF2B2B2B),
+      return RefreshIndicator(
+        color: const Color(0xFFFF7043),
+        onRefresh: () => controller.loadHome(),
+        child: ListView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+          children: [
+            BrandLogo(
+              avatarUrl: profile.avatarUrl,
+              onAvatarTap: onProfileTap,
             ),
-          ),
-          const SizedBox(height: 14),
-          if (controller.enrolledProjects.isEmpty)
+            const SizedBox(height: 16),
+            GreetingHeader(name: profile.name, subtitle: _subtitle),
+            const SizedBox(height: 20),
+            ActionCardRow(
+              onCreateTap: onCreateTap,
+              onExploreTap: onExploreTap,
+            ),
+            const SizedBox(height: 28),
             const Text(
-              'Aún no participas en ningún proyecto.',
-              style: TextStyle(fontSize: 13.5, color: Color(0xFF9E9E9E)),
-            )
-          else
-            for (final project in controller.enrolledProjects) ...[
-              EnrolledProjectCard(project: project),
-              const SizedBox(height: 14),
-            ],
-          const SizedBox(height: 10),
-        ],
+              _projectsTitle,
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w700,
+                color: Color(0xFF2B2B2B),
+              ),
+            ),
+            const SizedBox(height: 14),
+            if (controller.enrolledProjects.isEmpty)
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: const Color(0xFFE0D8CF)),
+                ),
+                child: Column(
+                  children: [
+                    const Icon(Icons.folder_open_rounded, size: 40, color: Color(0xFFBDBDBD)),
+                    const SizedBox(height: 8),
+                    const Text(
+                      'Aún no participas en ningún proyecto.',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(fontSize: 14, color: Color(0xFF757575)),
+                    ),
+                    const SizedBox(height: 12),
+                    TextButton(
+                      onPressed: onExploreTap,
+                      child: const Text(
+                        'Explorar proyectos disponibles',
+                        style: TextStyle(color: Color(0xFFFF7043), fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ],
+                ),
+              )
+            else
+              for (final project in controller.enrolledProjects) ...[
+                EnrolledProjectCard(project: project),
+                const SizedBox(height: 14),
+              ],
+            const SizedBox(height: 20),
+          ],
+        ),
       );
     });
   }

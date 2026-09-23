@@ -24,43 +24,50 @@ class MyProjectsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final MyProjectsController controller = Get.find();
 
-    return ListView(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-      children: [
-        BrandLogo(avatarUrl: avatarUrl, onAvatarTap: onProfileTap),
-        const SizedBox(height: 18),
-        const Text(
-          'Mis Proyectos',
-          style: TextStyle(
-            fontSize: 26,
-            fontWeight: FontWeight.w800,
-            color: Color(0xFF2B2B2B),
+    return RefreshIndicator(
+      color: const Color(0xFFFF7043),
+      onRefresh: () => controller.loadProjects(),
+      child: ListView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+        children: [
+          BrandLogo(avatarUrl: avatarUrl, onAvatarTap: onProfileTap),
+          const SizedBox(height: 18),
+          const Text(
+            'Mis Proyectos',
+            style: TextStyle(
+              fontSize: 26,
+              fontWeight: FontWeight.w800,
+              color: Color(0xFF2B2B2B),
+            ),
           ),
-        ),
-        const SizedBox(height: 18),
-        Obx(
-          () => SegmentedTabs<MyProjectsTab>(
-            segments: const {
-              'Creados': MyProjectsTab.created,
-              'Aplicados': MyProjectsTab.applied,
-            },
-            selected: controller.tab,
-            onSelected: controller.selectTab,
+          const SizedBox(height: 18),
+          Obx(
+            () => SegmentedTabs<MyProjectsTab>(
+              segments: const {
+                'Creados': MyProjectsTab.created,
+                'Aplicados': MyProjectsTab.applied,
+              },
+              selected: controller.tab,
+              onSelected: controller.selectTab,
+            ),
           ),
-        ),
-        const SizedBox(height: 18),
-        Obx(() {
-          if (controller.isLoading &&
-              controller.createdProjects.isEmpty &&
-              controller.appliedProjects.isEmpty) {
-            return const Padding(
-              padding: EdgeInsets.only(top: 60),
-              child: Center(child: CircularProgressIndicator()),
-            );
-          }
-          return _buildList(controller);
-        }),
-      ],
+          const SizedBox(height: 18),
+          Obx(() {
+            if (controller.isLoading &&
+                controller.createdProjects.isEmpty &&
+                controller.appliedProjects.isEmpty) {
+              return const Padding(
+                padding: EdgeInsets.only(top: 60),
+                child: Center(
+                  child: CircularProgressIndicator(color: Color(0xFFFF7043)),
+                ),
+              );
+            }
+            return _buildList(controller);
+          }),
+        ],
+      ),
     );
   }
 

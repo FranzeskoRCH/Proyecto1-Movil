@@ -4,6 +4,7 @@ import 'application_status.dart';
 class Applicant {
   Applicant({
     required this.id,
+    this.collaboratorId = '',
     required this.name,
     required this.avatarUrl,
     required this.career,
@@ -11,7 +12,10 @@ class Applicant {
     this.status = ApplicationStatus.underReview,
   });
 
+  /// ID del registro en la tabla application (para update/delete).
   String id;
+  /// ID del collaborator (UUID del usuario, para project_member).
+  String collaboratorId;
   String name;
   String avatarUrl;
   String career;

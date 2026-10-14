@@ -22,7 +22,8 @@ class RobleService with NetworkLoggy {
       '';
 
   void init({required String baseUrl, required String contractId}) {
-    loggy.info('[ROBLE_SERVICE] Inicializando cliente Roble API. BaseUrl: $baseUrl | ContractId: $contractId');
+    loggy.info(
+        '[ROBLE_SERVICE] Inicializando cliente Roble API. BaseUrl: $baseUrl | ContractId: $contractId');
     db = RobleApiDataBase(
       config: RobleApiConfig.fromContract(
         baseUrl: baseUrl,
@@ -40,7 +41,8 @@ class RobleService with NetworkLoggy {
       final hasSession = await db.restoreSession(verify: true);
       if (hasSession) {
         _cachedUser = await db.currentUser();
-        loggy.info('[ROBLE_SERVICE] Sesion restaurada con exito. Usuario: ${_cachedUser?['email']} (ID: $currentUserId)');
+        loggy.info(
+            '[ROBLE_SERVICE] Sesion restaurada con exito. Usuario: ${_cachedUser?['email']} (ID: $currentUserId)');
       } else {
         loggy.info('[ROBLE_SERVICE] No se encontro sesion previa activa.');
       }
@@ -53,12 +55,14 @@ class RobleService with NetworkLoggy {
 
   /// Cierra la sesión activa en Roble
   Future<void> clearSession() async {
-    loggy.info('[ROBLE_SERVICE] Cerrando sesion en backend y limpiando almacenamiento local...');
+    loggy.info(
+        '[ROBLE_SERVICE] Cerrando sesion en backend y limpiando almacenamiento local...');
     try {
       await db.logout();
       loggy.info('[ROBLE_SERVICE] Sesion cerrada en backend correctamente.');
     } catch (e) {
-      loggy.warning('[ROBLE_SERVICE] Advertencia al cerrar sesion en backend: $e');
+      loggy.warning(
+          '[ROBLE_SERVICE] Advertencia al cerrar sesion en backend: $e');
     }
     _cachedUser = null;
     loggy.info('[ROBLE_SERVICE] Cache de usuario limpiado.');
@@ -67,12 +71,30 @@ class RobleService with NetworkLoggy {
   /// Guarda los datos del usuario en memoria para acceso rápido
   void setCachedUser(Map<String, dynamic> user) {
     _cachedUser = user;
-    loggy.info('[ROBLE_SERVICE] Cache actualizado: ${user['email']} (ID: $currentUserId)');
+    loggy.info(
+        '[ROBLE_SERVICE] Cache actualizado: ${user['email']} (ID: $currentUserId)');
   }
 
   /// Actualiza los datos cacheados del usuario
   void updateCachedUser(Map<String, dynamic> data) {
     _cachedUser = {...?_cachedUser, ...data};
-    loggy.info('[ROBLE_SERVICE] Cache parcialmente actualizado con nuevas propiedades: ${data.keys.toList()}');
+    loggy.info(
+        '[ROBLE_SERVICE] Cache parcialmente actualizado con nuevas propiedades: ${data.keys.toList()}');
+  }
+
+  /// Busca el perfil de un colaborador por su id de usuario.
+  ///
+  /// En Roble el UUID del usuario vive en la columna `id` de `collaborator`
+  /// (el `_id` es el identificador interno de Roble y es distinto). Por eso se
+  /// intenta primero `id` y luego `_id`, para tolerar datos antiguos.
+  Future<Map<String, dynamic>?> findCollaborator(String userId) async {
+    if (userId.isEmpty) return null;
+    for (final field in const ['id', '_id']) {
+      try {
+        final rows = await db.read('collaborator', filters: {field: userId});
+        if (rows.isNotEmpty) return rows.first;
+      } catch (_) {}
+    }
+    return null;
   }
 }

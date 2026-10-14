@@ -64,7 +64,8 @@ class _LoginPageState extends State<LoginPage> {
                         borderRadius: BorderRadius.circular(20),
                         boxShadow: [
                           BoxShadow(
-                            color: const Color(0xFFFF7043).withValues(alpha: 0.3),
+                            color:
+                                const Color(0xFFFF7043).withValues(alpha: 0.3),
                             blurRadius: 16,
                             offset: const Offset(0, 8),
                           ),
@@ -105,7 +106,8 @@ class _LoginPageState extends State<LoginPage> {
                     decoration: InputDecoration(
                       labelText: 'Correo institucional o personal',
                       hintText: 'ejemplo@uninorte.edu.co',
-                      prefixIcon: const Icon(Icons.email_outlined, color: Color(0xFFFF7043)),
+                      prefixIcon: const Icon(Icons.email_outlined,
+                          color: Color(0xFFFF7043)),
                       filled: true,
                       fillColor: Colors.white,
                       border: OutlineInputBorder(
@@ -114,11 +116,13 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(16),
-                        borderSide: const BorderSide(color: Color(0xFFE0D8CF), width: 1),
+                        borderSide: const BorderSide(
+                            color: Color(0xFFE0D8CF), width: 1),
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(16),
-                        borderSide: const BorderSide(color: Color(0xFFFF7043), width: 2),
+                        borderSide: const BorderSide(
+                            color: Color(0xFFFF7043), width: 2),
                       ),
                     ),
                     validator: (value) {
@@ -139,10 +143,13 @@ class _LoginPageState extends State<LoginPage> {
                     obscureText: _obscurePassword,
                     decoration: InputDecoration(
                       labelText: 'Contraseña',
-                      prefixIcon: const Icon(Icons.lock_outline, color: Color(0xFFFF7043)),
+                      prefixIcon: const Icon(Icons.lock_outline,
+                          color: Color(0xFFFF7043)),
                       suffixIcon: IconButton(
                         icon: Icon(
-                          _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                          _obscurePassword
+                              ? Icons.visibility_off
+                              : Icons.visibility,
                           color: const Color(0xFF757575),
                         ),
                         onPressed: () {
@@ -159,19 +166,18 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(16),
-                        borderSide: const BorderSide(color: Color(0xFFE0D8CF), width: 1),
+                        borderSide: const BorderSide(
+                            color: Color(0xFFE0D8CF), width: 1),
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(16),
-                        borderSide: const BorderSide(color: Color(0xFFFF7043), width: 2),
+                        borderSide: const BorderSide(
+                            color: Color(0xFFFF7043), width: 2),
                       ),
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Ingresa tu contraseña';
-                      }
-                      if (value.length < 6) {
-                        return 'Mínimo 6 caracteres';
                       }
                       return null;
                     },

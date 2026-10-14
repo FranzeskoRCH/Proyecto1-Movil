@@ -4,13 +4,12 @@ import '../../../domain/models/applied_project.dart';
 import '../../../domain/models/created_project.dart';
 import '../i_project_source.dart';
 
-/// Fuente de datos activa mientras no exista backend.
+/// Fuente de datos local (offline).
 ///
 /// Devuelve los proyectos aplicados y creados simulando la respuesta de la API.
 /// Mantiene el estado de los postulantes en memoria para que aceptar, rechazar
-/// y eliminar se comporten como lo haría el backend. Cuando exista un backend
-/// real, esta clase se reemplaza por [RemoteProjectSource] en
-/// `project_dependencies.dart`.
+/// y eliminar se comporten como lo haría el backend. [RobleProjectSource] la usa
+/// como respaldo cuando no hay sesión, y las pruebas la usan como doble.
 class LocalProjectSource implements IProjectSource {
   LocalProjectSource()
       : _appliedProjects =
@@ -33,7 +32,10 @@ class LocalProjectSource implements IProjectSource {
 
   @override
   Future<CreatedProject> getCreatedProjectById(String id) async {
-    return _createdProjects.firstWhere((project) => project.id == id);
+    return _createdProjects.firstWhere(
+      (project) => project.id == id,
+      orElse: () => throw Exception('Proyecto creado no encontrado: $id'),
+    );
   }
 
   @override
@@ -51,12 +53,55 @@ class LocalProjectSource implements IProjectSource {
     _applicant(projectId, applicantId).status = ApplicationStatus.rejected;
   }
 
+  @override
+  Future<void> withdrawApplication(String applicationId) async {
+    _appliedProjects.removeWhere((project) => project.id == applicationId);
+  }
+
+  @override
+  Future<void> updateProject({
+    required String projectId,
+    required String title,
+    required String description,
+    required String vision,
+    required int vacancies,
+    required CreatedProjectStatus status,
+    required List<String> categories,
+    required List<String> roles,
+    String? imageUrl,
+  }) async {
+    final project = _createdProjects.firstWhere(
+      (p) => p.id == projectId,
+      orElse: () =>
+          throw Exception('Proyecto creado no encontrado: $projectId'),
+    );
+    project
+      ..title = title
+      ..description = description
+      ..vision = vision
+      ..vacancies = vacancies
+      ..status = status
+      ..categories = List<String>.of(categories)
+      ..roles = List<String>.of(roles);
+    if (imageUrl != null && imageUrl.isNotEmpty) {
+      project.imageUrl = imageUrl;
+    }
+  }
+
+  @override
+  Future<void> deleteProject(String projectId) async {
+    _createdProjects.removeWhere((project) => project.id == projectId);
+  }
+
   Applicant _applicant(String projectId, String applicantId) {
     final project = _createdProjects.firstWhere(
       (project) => project.id == projectId,
+      orElse: () =>
+          throw Exception('Proyecto creado no encontrado: $projectId'),
     );
     return project.applicants.firstWhere(
       (applicant) => applicant.id == applicantId,
+      orElse: () => throw Exception('Postulante no encontrado: $applicantId'),
     );
   }
 

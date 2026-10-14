@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 import 'package:loggy/loggy.dart';
 
+import '../../../../core/roble_error_handler.dart';
 import '../../domain/models/application_status.dart';
 import '../../domain/models/created_project.dart';
 import '../../domain/repositories/i_project_repository.dart';
@@ -24,6 +25,9 @@ class TeamManagementController extends GetxController with UiLoggy {
   Future<void> loadProject(String id) async {
     loggy.debug('TeamManagementController: Fetching project $id');
     _isLoading.value = true;
+    // Limpiar el proyecto anterior: el controlador es un singleton y la vista
+    // muestra el spinner solo mientras `project == null`.
+    _project.value = null;
     try {
       _project.value = await repository.getCreatedProjectById(id);
     } catch (exception) {
@@ -43,6 +47,7 @@ class TeamManagementController extends GetxController with UiLoggy {
       applicantId,
       () => repository.acceptApplicant(project.id, applicantId),
       newStatus: ApplicationStatus.accepted,
+      successMessage: 'Colaborador aceptado en el equipo.',
     );
   }
 
@@ -53,6 +58,7 @@ class TeamManagementController extends GetxController with UiLoggy {
       applicantId,
       () => repository.rejectApplicant(project.id, applicantId),
       newStatus: ApplicationStatus.rejected,
+      successMessage: 'Postulación rechazada.',
     );
   }
 
@@ -63,6 +69,7 @@ class TeamManagementController extends GetxController with UiLoggy {
       applicantId,
       () => repository.removeMember(project.id, applicantId),
       isRemove: true,
+      successMessage: 'Integrante retirado del equipo.',
     );
   }
 
@@ -71,6 +78,7 @@ class TeamManagementController extends GetxController with UiLoggy {
     Future<void> Function() action, {
     ApplicationStatus? newStatus,
     bool isRemove = false,
+    String? successMessage,
   }) async {
     if (_processingId.value != null) return;
     _processingId.value = applicantId;
@@ -97,13 +105,23 @@ class TeamManagementController extends GetxController with UiLoggy {
           _project.value = refreshed;
         } catch (_) {}
       }
+
+      if (successMessage != null) {
+        RobleErrorHandler.showSuccessSnackbar(
+          title: 'Listo',
+          message: successMessage,
+        );
+      }
     } catch (exception) {
       loggy.error(
         'TeamManagementController: Error updating applicant: $exception',
+      );
+      RobleErrorHandler.showErrorSnackbar(
+        title: 'No se pudo completar la acción',
+        error: exception,
       );
     } finally {
       _processingId.value = null;
     }
   }
 }
-

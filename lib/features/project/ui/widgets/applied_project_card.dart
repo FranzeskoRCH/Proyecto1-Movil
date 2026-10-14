@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../domain/models/application_status.dart';
 import '../../domain/models/applied_project.dart';
 import 'status_badge.dart';
 
@@ -9,10 +10,14 @@ class AppliedProjectCard extends StatelessWidget {
     super.key,
     required this.project,
     required this.onViewDetails,
+    this.onWithdraw,
   });
 
   final AppliedProject project;
   final VoidCallback onViewDetails;
+
+  /// Si se provee, muestra "Cancelar postulación" (solo en revisión).
+  final VoidCallback? onWithdraw;
 
   @override
   Widget build(BuildContext context) {
@@ -55,10 +60,7 @@ class AppliedProjectCard extends StatelessWidget {
                     const SizedBox(height: 2),
                     const Text(
                       'Creador',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Color(0xFF9E9E9E),
-                      ),
+                      style: TextStyle(fontSize: 12, color: Color(0xFF9E9E9E)),
                     ),
                   ],
                 ),
@@ -120,6 +122,29 @@ class AppliedProjectCard extends StatelessWidget {
               ),
             ],
           ),
+          if (onWithdraw != null &&
+              project.status == ApplicationStatus.underReview) ...[
+            const SizedBox(height: 12),
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                onPressed: onWithdraw,
+                icon: const Icon(Icons.undo_rounded, size: 16),
+                label: const Text(
+                  'Cancelar postulación',
+                  style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+                ),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: const Color(0xFFF0552F),
+                  side: const BorderSide(color: Color(0xFFF0552F)),
+                  padding: const EdgeInsets.symmetric(vertical: 10),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                ),
+              ),
+            ),
+          ],
         ],
       ),
     );

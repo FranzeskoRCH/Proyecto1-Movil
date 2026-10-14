@@ -1,6 +1,8 @@
 import 'package:get/get.dart';
 import 'package:loggy/loggy.dart';
 
+import '../../../../core/roble_error_handler.dart';
+import '../../../explore/ui/viewmodels/explore_controller.dart';
 import '../../domain/models/applied_project.dart';
 import '../../domain/models/created_project.dart';
 import '../../domain/repositories/i_project_repository.dart';
@@ -49,4 +51,89 @@ class MyProjectsController extends GetxController with UiLoggy {
   }
 
   void selectTab(MyProjectsTab tab) => _tab.value = tab;
+
+  /// Retira una postulación enviada y la quita de la lista de aplicados.
+  Future<bool> withdrawApplication(AppliedProject project) async {
+    try {
+      await repository.withdrawApplication(project.id);
+      _appliedProjects.removeWhere((p) => p.id == project.id);
+      RobleErrorHandler.showSuccessSnackbar(
+        title: 'Postulación retirada',
+        message: 'Ya no apareces como postulante en "${project.title}".',
+      );
+      return true;
+    } catch (e) {
+      RobleErrorHandler.showErrorSnackbar(
+        title: 'No se pudo retirar',
+        error: e,
+      );
+      return false;
+    }
+  }
+
+  /// Actualiza un proyecto propio y refresca las listas dependientes.
+  Future<bool> updateProject({
+    required String projectId,
+    required String title,
+    required String description,
+    required String vision,
+    required int vacancies,
+    required CreatedProjectStatus status,
+    required List<String> categories,
+    required List<String> roles,
+    String? imageUrl,
+  }) async {
+    try {
+      await repository.updateProject(
+        projectId: projectId,
+        title: title,
+        description: description,
+        vision: vision,
+        vacancies: vacancies,
+        status: status,
+        categories: categories,
+        roles: roles,
+        imageUrl: imageUrl,
+      );
+      await loadProjects();
+      _refreshExplore();
+      RobleErrorHandler.showSuccessSnackbar(
+        title: 'Proyecto actualizado',
+        message: 'Los cambios en "$title" se guardaron correctamente.',
+      );
+      return true;
+    } catch (e) {
+      RobleErrorHandler.showErrorSnackbar(
+        title: 'No se pudo actualizar',
+        error: e,
+      );
+      return false;
+    }
+  }
+
+  /// Elimina un proyecto propio y lo quita de la lista de creados.
+  Future<bool> deleteProject(CreatedProject project) async {
+    try {
+      await repository.deleteProject(project.id);
+      _createdProjects.removeWhere((p) => p.id == project.id);
+      _refreshExplore();
+      RobleErrorHandler.showSuccessSnackbar(
+        title: 'Proyecto eliminado',
+        message: '"${project.title}" se eliminó definitivamente.',
+      );
+      return true;
+    } catch (e) {
+      RobleErrorHandler.showErrorSnackbar(
+        title: 'No se pudo eliminar',
+        error: e,
+      );
+      return false;
+    }
+  }
+
+  void _refreshExplore() {
+    if (Get.isRegistered<ExploreController>()) {
+      Get.find<ExploreController>().loadProjects();
+    }
+  }
 }

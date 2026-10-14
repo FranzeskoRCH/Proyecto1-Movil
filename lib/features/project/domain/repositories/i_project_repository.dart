@@ -14,4 +14,23 @@ abstract class IProjectRepository {
   Future<void> rejectApplicant(String projectId, String applicantId);
 
   Future<void> removeMember(String projectId, String applicantId);
+
+  /// Retira una postulación enviada (borra la application del usuario).
+  Future<void> withdrawApplication(String applicationId);
+
+  /// Actualiza los datos de un proyecto propio y reemplaza sus categorías y roles.
+  Future<void> updateProject({
+    required String projectId,
+    required String title,
+    required String description,
+    required String vision,
+    required int vacancies,
+    required CreatedProjectStatus status,
+    required List<String> categories,
+    required List<String> roles,
+    String? imageUrl,
+  });
+
+  /// Elimina un proyecto propio junto con sus datos asociados.
+  Future<void> deleteProject(String projectId);
 }

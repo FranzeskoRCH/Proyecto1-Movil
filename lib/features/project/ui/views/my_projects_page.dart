@@ -1,12 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../../../core/project_share.dart';
+import '../../../../core/widgets/app_confirm_dialog.dart';
 import '../../../../core/widgets/brand_logo.dart';
+import '../../domain/models/applied_project.dart';
+import '../../domain/models/created_project.dart';
 import '../viewmodels/my_projects_controller.dart';
 import '../widgets/applied_project_card.dart';
 import '../widgets/created_project_card.dart';
 import '../widgets/segmented_tabs.dart';
 import 'applied_project_detail_page.dart';
+import 'edit_project_page.dart';
 import 'team_management_page.dart';
 
 /// Contenido de la pestaña "Proyectos": Mis Proyectos (Creados / Aplicados).
@@ -64,14 +69,14 @@ class MyProjectsPage extends StatelessWidget {
                 ),
               );
             }
-            return _buildList(controller);
+            return _buildList(context, controller);
           }),
         ],
       ),
     );
   }
 
-  Widget _buildList(MyProjectsController controller) {
+  Widget _buildList(BuildContext context, MyProjectsController controller) {
     if (controller.tab == MyProjectsTab.created) {
       if (controller.createdProjects.isEmpty) {
         return const _EmptyText('Aún no has creado proyectos.');
@@ -82,11 +87,20 @@ class MyProjectsPage extends StatelessWidget {
             CreatedProjectCard(
               project: project,
               onManageTeam: () async {
-                await Get.to(
-                  () => TeamManagementPage(projectId: project.id),
-                );
+                await Get.to(() => TeamManagementPage(projectId: project.id));
                 controller.loadProjects();
               },
+              onEdit: () async {
+                await Get.to(() => EditProjectPage(project: project));
+                controller.loadProjects();
+              },
+              onDelete: () => _confirmDelete(controller, project),
+              onShare: () => shareProject(
+                context,
+                projectId: project.id,
+                title: project.title,
+                description: project.description,
+              ),
             ),
             const SizedBox(height: 16),
           ],
@@ -102,14 +116,43 @@ class MyProjectsPage extends StatelessWidget {
         for (final project in controller.appliedProjects) ...[
           AppliedProjectCard(
             project: project,
-            onViewDetails: () => Get.to(
-              () => AppliedProjectDetailPage(project: project),
-            ),
+            onViewDetails: () =>
+                Get.to(() => AppliedProjectDetailPage(project: project)),
+            onWithdraw: () => _confirmWithdraw(controller, project),
           ),
           const SizedBox(height: 16),
         ],
       ],
     );
+  }
+
+  Future<void> _confirmWithdraw(
+    MyProjectsController controller,
+    AppliedProject project,
+  ) async {
+    final bool confirmed = await showAppConfirmDialog(
+      title: 'Cancelar postulación',
+      message: '¿Retirar tu postulación a "${project.title}"?',
+      confirmText: 'Sí, retirar',
+      confirmColor: const Color(0xFFF0552F),
+      icon: Icons.undo_rounded,
+    );
+    if (confirmed) controller.withdrawApplication(project);
+  }
+
+  Future<void> _confirmDelete(
+    MyProjectsController controller,
+    CreatedProject project,
+  ) async {
+    final bool confirmed = await showAppConfirmDialog(
+      title: 'Eliminar proyecto',
+      message: '¿Eliminar "${project.title}"? Se borrarán también sus '
+          'postulaciones y miembros. Esta acción no se puede deshacer.',
+      confirmText: 'Sí, eliminar',
+      confirmColor: const Color(0xFFD32F2F),
+      icon: Icons.delete_outline_rounded,
+    );
+    if (confirmed) controller.deleteProject(project);
   }
 }
 
@@ -123,10 +166,7 @@ class _EmptyText extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(top: 60),
       child: Center(
-        child: Text(
-          message,
-          style: const TextStyle(color: Color(0xFF6B6B6B)),
-        ),
+        child: Text(message, style: const TextStyle(color: Color(0xFF6B6B6B))),
       ),
     );
   }

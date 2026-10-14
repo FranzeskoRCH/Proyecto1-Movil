@@ -9,10 +9,16 @@ class CreatedProjectCard extends StatelessWidget {
     super.key,
     required this.project,
     required this.onManageTeam,
+    required this.onEdit,
+    required this.onDelete,
+    required this.onShare,
   });
 
   final CreatedProject project;
   final VoidCallback onManageTeam;
+  final VoidCallback onEdit;
+  final VoidCallback onDelete;
+  final VoidCallback onShare;
 
   @override
   Widget build(BuildContext context) {
@@ -47,6 +53,67 @@ class CreatedProjectCard extends StatelessWidget {
               ),
               const SizedBox(width: 10),
               StatusBadge.project(project.status),
+              SizedBox(
+                height: 28,
+                width: 28,
+                child: PopupMenuButton<String>(
+                  padding: EdgeInsets.zero,
+                  iconSize: 20,
+                  icon: const Icon(
+                    Icons.more_vert,
+                    color: Color(0xFF9E9E9E),
+                  ),
+                  tooltip: 'Opciones',
+                  onSelected: (value) {
+                    if (value == 'edit') {
+                      onEdit();
+                    } else if (value == 'share') {
+                      onShare();
+                    } else if (value == 'delete') {
+                      onDelete();
+                    }
+                  },
+                  itemBuilder: (context) => const [
+                    PopupMenuItem(
+                      value: 'edit',
+                      child: Row(
+                        children: [
+                          Icon(Icons.edit_outlined, size: 18),
+                          SizedBox(width: 10),
+                          Text('Editar'),
+                        ],
+                      ),
+                    ),
+                    PopupMenuItem(
+                      value: 'share',
+                      child: Row(
+                        children: [
+                          Icon(Icons.share_outlined, size: 18),
+                          SizedBox(width: 10),
+                          Text('Compartir'),
+                        ],
+                      ),
+                    ),
+                    PopupMenuItem(
+                      value: 'delete',
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.delete_outline,
+                            size: 18,
+                            color: Color(0xFFD32F2F),
+                          ),
+                          SizedBox(width: 10),
+                          Text(
+                            'Eliminar',
+                            style: TextStyle(color: Color(0xFFD32F2F)),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ],
           ),
           const SizedBox(height: 8),

@@ -21,7 +21,11 @@ class CreatedProject {
   CreatedProject({
     required this.id,
     required this.title,
-    required this.description,
+    this.description = '',
+    this.vision = '',
+    this.imageUrl = '',
+    this.categories = const [],
+    this.roles = const [],
     required this.status,
     required this.vacancies,
     required this.applicants,
@@ -30,6 +34,10 @@ class CreatedProject {
   String id;
   String title;
   String description;
+  String vision;
+  String imageUrl;
+  List<String> categories;
+  List<String> roles;
   CreatedProjectStatus status;
   int vacancies;
   List<Applicant> applicants;
@@ -44,6 +52,14 @@ class CreatedProject {
         id: json['id'] as String,
         title: json['title'] as String,
         description: json['description'] ?? '',
+        vision: json['vision'] as String? ?? '',
+        imageUrl: (json['imageUrl'] ?? json['image_url']) as String? ?? '',
+        categories: (json['categories'] as List<dynamic>? ?? [])
+            .map((category) => category.toString())
+            .toList(),
+        roles: (json['roles'] as List<dynamic>? ?? [])
+            .map((role) => role.toString())
+            .toList(),
         status: CreatedProjectStatus.fromName(json['status'] as String?),
         vacancies: json['vacancies'] as int? ?? 0,
         applicants: (json['applicants'] as List<dynamic>? ?? [])
@@ -56,9 +72,14 @@ class CreatedProject {
         'id': id,
         'title': title,
         'description': description,
+        'vision': vision,
+        'imageUrl': imageUrl,
+        'categories': categories,
+        'roles': roles,
         'status': status.name,
         'vacancies': vacancies,
-        'applicants': applicants.map((applicant) => applicant.toJson()).toList(),
+        'applicants':
+            applicants.map((applicant) => applicant.toJson()).toList(),
       };
 
   @override

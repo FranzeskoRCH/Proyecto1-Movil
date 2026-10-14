@@ -32,7 +32,8 @@ void main() {
     await source.acceptApplicant(project.id, pending.id);
 
     final updated = await source.getCreatedProjectById(project.id);
-    expect(updated.teamMembers.any((member) => member.id == pending.id), isTrue);
+    expect(
+        updated.teamMembers.any((member) => member.id == pending.id), isTrue);
     expect(
       updated.pendingApplicants.any((applicant) => applicant.id == pending.id),
       isFalse,
@@ -63,5 +64,14 @@ void main() {
       updated.teamMembers.any((member) => member.id == removed.id),
       isFalse,
     );
+  });
+
+  test('withdrawApplication quita la postulación de la lista', () async {
+    final applied = (await source.getAppliedProjects()).first;
+
+    await source.withdrawApplication(applied.id);
+
+    final updated = await source.getAppliedProjects();
+    expect(updated.any((project) => project.id == applied.id), isFalse);
   });
 }

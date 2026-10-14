@@ -11,16 +11,20 @@ class ApplicantTile extends StatelessWidget {
     super.key,
     required this.applicant,
     this.isProcessing = false,
+    this.acceptEnabled = true,
     this.onAccept,
     this.onReject,
     this.onRemove,
+    this.onViewProfile,
   });
 
   final Applicant applicant;
   final bool isProcessing;
+  final bool acceptEnabled;
   final VoidCallback? onAccept;
   final VoidCallback? onReject;
   final VoidCallback? onRemove;
+  final VoidCallback? onViewProfile;
 
   @override
   Widget build(BuildContext context) {
@@ -36,8 +40,9 @@ class ApplicantTile extends StatelessWidget {
           CircleAvatar(
             radius: 22,
             backgroundColor: const Color(0xFFEADFD6),
-            backgroundImage:
-                applicant.avatarUrl.isEmpty ? null : NetworkImage(applicant.avatarUrl),
+            backgroundImage: applicant.avatarUrl.isEmpty
+                ? null
+                : NetworkImage(applicant.avatarUrl),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -66,7 +71,20 @@ class ApplicantTile extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 8),
-          _buildActions(),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (onViewProfile != null) ...[
+                _IconAction(
+                  icon: Icons.person_outline,
+                  color: const Color(0xFF6B6B6B),
+                  onTap: onViewProfile!,
+                ),
+                const SizedBox(width: 8),
+              ],
+              _buildActions(),
+            ],
+          ),
         ],
       ),
     );
@@ -77,7 +95,10 @@ class ApplicantTile extends StatelessWidget {
       return const SizedBox(
         height: 22,
         width: 22,
-        child: CircularProgressIndicator(strokeWidth: 2.2),
+        child: CircularProgressIndicator(
+          strokeWidth: 2.2,
+          color: Color(0xFFFF7043),
+        ),
       );
     }
 
@@ -97,6 +118,7 @@ class ApplicantTile extends StatelessWidget {
             icon: Icons.check_rounded,
             color: const Color(0xFF2E9E5B),
             onTap: onAccept!,
+            enabled: acceptEnabled,
           ),
           const SizedBox(width: 8),
           _IconAction(
@@ -142,25 +164,28 @@ class _IconAction extends StatelessWidget {
     required this.icon,
     required this.color,
     required this.onTap,
+    this.enabled = true,
   });
 
   final IconData icon;
   final Color color;
   final VoidCallback onTap;
+  final bool enabled;
 
   @override
   Widget build(BuildContext context) {
+    final Color effectiveColor = enabled ? color : const Color(0xFFBFBFBF);
     return GestureDetector(
-      onTap: onTap,
+      onTap: enabled ? onTap : null,
       child: Container(
         height: 36,
         width: 36,
         alignment: Alignment.center,
         decoration: BoxDecoration(
-          color: color.withValues(alpha: 0.12),
+          color: effectiveColor.withValues(alpha: enabled ? 0.12 : 0.08),
           shape: BoxShape.circle,
         ),
-        child: Icon(icon, size: 20, color: color),
+        child: Icon(icon, size: 20, color: effectiveColor),
       ),
     );
   }

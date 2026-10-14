@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../../../core/widgets/section_label.dart';
+import '../../../profile/ui/views/public_profile_page.dart';
 import '../viewmodels/team_management_controller.dart';
 import '../widgets/applicant_tile.dart';
 
@@ -31,7 +32,9 @@ class _TeamManagementPageState extends State<TeamManagementPage> {
       body: SafeArea(
         child: Obx(() {
           if (controller.isLoading && controller.project == null) {
-            return const Center(child: CircularProgressIndicator());
+            return const Center(
+              child: CircularProgressIndicator(color: Color(0xFFFF7043)),
+            );
           }
 
           final project = controller.project;
@@ -80,8 +83,20 @@ class _TeamManagementPageState extends State<TeamManagementPage> {
                   ApplicantTile(
                     applicant: applicant,
                     isProcessing: controller.processingId == applicant.id,
+                    acceptEnabled: project.vacancies <= 0 ||
+                        team.length < project.vacancies,
                     onAccept: () => controller.accept(applicant.id),
                     onReject: () => controller.reject(applicant.id),
+                    onViewProfile: applicant.collaboratorId.isEmpty
+                        ? null
+                        : () => Get.to(
+                              () => PublicProfilePage(
+                                userId: applicant.collaboratorId,
+                                fallbackName: applicant.name,
+                                fallbackCareer: applicant.career,
+                                fallbackAvatarUrl: applicant.avatarUrl,
+                              ),
+                            ),
                   ),
                   const SizedBox(height: 10),
                 ],
@@ -96,6 +111,16 @@ class _TeamManagementPageState extends State<TeamManagementPage> {
                     applicant: member,
                     isProcessing: controller.processingId == member.id,
                     onRemove: () => controller.remove(member.id),
+                    onViewProfile: member.collaboratorId.isEmpty
+                        ? null
+                        : () => Get.to(
+                              () => PublicProfilePage(
+                                userId: member.collaboratorId,
+                                fallbackName: member.name,
+                                fallbackCareer: member.career,
+                                fallbackAvatarUrl: member.avatarUrl,
+                              ),
+                            ),
                   ),
                   const SizedBox(height: 10),
                 ],
@@ -214,10 +239,7 @@ class _EmptyText extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       message,
-      style: const TextStyle(
-        fontSize: 13.5,
-        color: Color(0xFF9E9E9E),
-      ),
+      style: const TextStyle(fontSize: 13.5, color: Color(0xFF9E9E9E)),
     );
   }
 }

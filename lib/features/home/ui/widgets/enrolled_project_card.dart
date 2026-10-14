@@ -4,9 +4,12 @@ import '../../domain/models/enrolled_project.dart';
 
 /// Tarjeta de un proyecto en el que el colaborador ya participa (aceptado).
 class EnrolledProjectCard extends StatelessWidget {
-  const EnrolledProjectCard({super.key, required this.project});
+  const EnrolledProjectCard({super.key, required this.project, this.onLeave});
 
   final EnrolledProject project;
+
+  /// Si se provee y es miembro, muestra "Salir del equipo".
+  final VoidCallback? onLeave;
 
   @override
   Widget build(BuildContext context) {
@@ -49,15 +52,15 @@ class EnrolledProjectCard extends StatelessWidget {
                     const SizedBox(height: 2),
                     const Text(
                       'Creador',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Color(0xFF9E9E9E),
-                      ),
+                      style: TextStyle(fontSize: 12, color: Color(0xFF9E9E9E)),
                     ),
                   ],
                 ),
               ),
-              const _AcceptedBadge(),
+              if (project.isMember)
+                const _AcceptedBadge()
+              else
+                _StatusChip(label: project.role),
             ],
           ),
           const SizedBox(height: 14),
@@ -78,9 +81,67 @@ class EnrolledProjectCard extends StatelessWidget {
               color: Color(0xFF6B6B6B),
             ),
           ),
-          const SizedBox(height: 14),
-          _RolePill(label: 'Tu rol: ${project.role}'),
+          if (project.isMember) ...[
+            const SizedBox(height: 14),
+            Row(
+              children: [
+                _RolePill(label: 'Tu rol: ${project.role}'),
+                const Spacer(),
+                if (onLeave != null)
+                  GestureDetector(
+                    onTap: onLeave,
+                    child: const Row(
+                      children: [
+                        Icon(Icons.logout, size: 15, color: Color(0xFFD45A5A)),
+                        SizedBox(width: 4),
+                        Text(
+                          'Salir del equipo',
+                          style: TextStyle(
+                            fontSize: 12.5,
+                            fontWeight: FontWeight.w700,
+                            color: Color(0xFFD45A5A),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+              ],
+            ),
+          ],
         ],
+      ),
+    );
+  }
+}
+
+class _StatusChip extends StatelessWidget {
+  const _StatusChip({required this.label});
+
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    final bool rejected = label.toLowerCase().contains('rechaz');
+    final Color color = rejected
+        ? const Color(0xFFD45A5A)
+        : const Color(0xFFC98A2B);
+    final Color background = rejected
+        ? const Color(0xFFFBE4E4)
+        : const Color(0xFFFDF1DC);
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(
+        color: background,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(
+          fontSize: 11.5,
+          fontWeight: FontWeight.w700,
+          color: color,
+        ),
       ),
     );
   }

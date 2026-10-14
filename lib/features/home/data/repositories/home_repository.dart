@@ -16,4 +16,8 @@ class HomeRepository implements IHomeRepository {
   @override
   Future<List<EnrolledProject>> getEnrolledProjects() async =>
       await source.getEnrolledProjects();
+
+  @override
+  Future<void> leaveProject(String projectId) async =>
+      await source.leaveProject(projectId);
 }

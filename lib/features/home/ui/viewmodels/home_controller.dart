@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 import 'package:loggy/loggy.dart';
 
+import '../../../../core/roble_error_handler.dart';
 import '../../domain/models/collaborator_profile.dart';
 import '../../domain/models/enrolled_project.dart';
 import '../../domain/repositories/i_home_repository.dart';
@@ -38,8 +39,29 @@ class HomeController extends GetxController with UiLoggy {
     } catch (exception) {
       loggy.error('HomeController: Error fetching home data: $exception');
       _profile.value = null;
+      // HIGIENE: evitar mostrar los proyectos del intento anterior.
+      _enrolledProjects.clear();
     } finally {
       _isLoading.value = false;
+    }
+  }
+
+  /// Abandona un proyecto en el que el colaborador es miembro.
+  Future<bool> leaveProject(EnrolledProject project) async {
+    try {
+      await repository.leaveProject(project.id);
+      _enrolledProjects.removeWhere((p) => p.id == project.id);
+      RobleErrorHandler.showSuccessSnackbar(
+        title: 'Saliste del equipo',
+        message: 'Ya no participas en "${project.title}".',
+      );
+      return true;
+    } catch (e) {
+      RobleErrorHandler.showErrorSnackbar(
+        title: 'No se pudo salir del equipo',
+        error: e,
+      );
+      return false;
     }
   }
 }

@@ -12,47 +12,54 @@ class RobleHomeSource implements IHomeSource {
     final cached = _roble.cachedUser;
 
     String name = cached?['name'] ?? 'Colaborador';
-    String avatarUrl = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150';
+    String avatarUrl =
+        'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150';
     String career = 'Estudiante';
     List<String> skills = [];
     List<String> interests = [];
 
     try {
       if (userId.isNotEmpty) {
-        // En Roble, _id en collaborator es el UUID del usuario
-        final profiles = await _roble.db.read('collaborator', filters: {'_id': userId});
-        if (profiles.isNotEmpty) {
-          final p = profiles.first;
+        // En Roble el UUID del usuario vive en collaborator.id
+        final p = await _roble.findCollaborator(userId);
+        if (p != null) {
           name = p['name']?.toString() ?? name;
-          avatarUrl = (p['avatar_url'] ?? p['avatarUrl'])?.toString() ?? avatarUrl;
+          avatarUrl =
+              (p['avatar_url'] ?? p['avatarUrl'])?.toString() ?? avatarUrl;
           career = p['career']?.toString() ?? career;
         }
 
         // Leer skills
-        final skillsData = await _roble.db.read('collaborator_skill', filters: {'collaborator_id': userId});
+        final skillsData = await _roble.db.read(
+          'collaborator_skill',
+          filters: {'collaborator_id': userId},
+        );
         final dbSkills = skillsData
-            .map((s) => (s['skill_name'] ?? s['skillName'] ?? s['name'] ?? '').toString())
+            .map(
+              (s) => (s['skill_name'] ?? s['skillName'] ?? s['name'] ?? '')
+                  .toString(),
+            )
             .where((s) => s.isNotEmpty)
             .toList();
         if (dbSkills.isNotEmpty) skills = dbSkills;
 
         // Leer interests
-        final interestsData = await _roble.db.read('collaborator_interest', filters: {'collaborator_id': userId});
+        final interestsData = await _roble.db.read(
+          'collaborator_interest',
+          filters: {'collaborator_id': userId},
+        );
         final dbInterests = interestsData
-            .map((i) => (i['interest_name'] ?? i['interestName'] ?? i['name'] ?? '').toString())
+            .map(
+              (i) =>
+                  (i['interest_name'] ?? i['interestName'] ?? i['name'] ?? '')
+                      .toString(),
+            )
             .where((i) => i.isNotEmpty)
             .toList();
         if (dbInterests.isNotEmpty) interests = dbInterests;
       }
     } catch (_) {
       // Si aún no existen datos o las tablas no están listas, mantener datos base seguros
-    }
-
-    if (skills.isEmpty) {
-      skills = ['Flutter', 'Diseño UI/UX', 'Trabajo en equipo'];
-    }
-    if (interests.isEmpty) {
-      interests = ['Tecnología', 'Innovación Social', 'Diseño'];
     }
 
     return CollaboratorProfile(
@@ -74,91 +81,156 @@ class RobleHomeSource implements IHomeSource {
 
     try {
       // 1. Proyectos en los que es miembro aceptado (project_member)
-      final members = await _roble.db.read('project_member', filters: {'collaborator_id': userId});
+      final members = await _roble.db.read(
+        'project_member',
+        filters: {'collaborator_id': userId},
+      );
 
       for (final m in members) {
         final projectId = (m['project_id'] ?? m['projectId'])?.toString();
         if (projectId == null || projectId.isEmpty) continue;
 
-        final projRows = await _roble.db.read('project', filters: {'_id': projectId});
+        // project_id guarda el id real del DDL, no el _id interno de Roble.
+        List<Map<String, dynamic>> projRows = await _roble.db.read(
+          'project',
+          filters: {'id': projectId},
+        );
+        if (projRows.isEmpty) {
+          projRows =
+              await _roble.db.read('project', filters: {'_id': projectId});
+        }
         if (projRows.isEmpty) continue;
         final project = projRows.first;
         // Preferir id (PK real del DDL) sobre _id (interno de Roble)
-        final realId = (project['id'] ?? project['_id'] ?? projectId).toString();
+        final realId =
+            (project['id'] ?? project['_id'] ?? projectId).toString();
 
         String authorName = 'Autor';
-        String authorAvatar = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150';
-        final authorId = (project['author_id'] ?? project['authorId'])?.toString();
+        String authorAvatar =
+            'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150';
+        final authorId =
+            (project['author_id'] ?? project['authorId'])?.toString();
         if (authorId != null && authorId.isNotEmpty) {
-          final authorProfiles = await _roble.db.read('collaborator', filters: {'_id': authorId});
-          if (authorProfiles.isNotEmpty) {
-            authorName = authorProfiles.first['name']?.toString() ?? authorName;
-            authorAvatar = (authorProfiles.first['avatar_url'] ?? authorProfiles.first['avatarUrl'])?.toString() ?? authorAvatar;
+          final authorProfile = await _roble.findCollaborator(authorId);
+          if (authorProfile != null) {
+            authorName = authorProfile['name']?.toString() ?? authorName;
+            authorAvatar =
+                (authorProfile['avatar_url'] ?? authorProfile['avatarUrl'])
+                        ?.toString() ??
+                    authorAvatar;
           }
         }
 
         if (!addedProjectIds.contains(realId)) {
           addedProjectIds.add(realId);
-          enrolled.add(EnrolledProject(
-            id: realId,
-            title: project['title']?.toString() ?? 'Proyecto sin título',
-            description: project['description']?.toString() ?? '',
-            authorName: authorName,
-            authorAvatarUrl: authorAvatar,
-            role: m['discipline']?.toString() ?? m['role']?.toString() ?? 'Miembro',
-          ));
+          enrolled.add(
+            EnrolledProject(
+              id: realId,
+              title: project['title']?.toString() ?? 'Proyecto sin título',
+              description: project['description']?.toString() ?? '',
+              authorName: authorName,
+              authorAvatarUrl: authorAvatar,
+              role: m['discipline']?.toString() ??
+                  m['role']?.toString() ??
+                  'Miembro',
+              isMember: true,
+            ),
+          );
         }
       }
     } catch (_) {}
 
     try {
       // 2. Proyectos a los que aplicó (application) — aparecen como "Aplicado"
-      final applications = await _roble.db.read('application', filters: {'applicant_id': userId});
+      final applications = await _roble.db.read(
+        'application',
+        filters: {'applicant_id': userId},
+      );
 
       for (final app in applications) {
-        final projectId = (app['project_id'] ?? app['projectId'] ?? '').toString();
+        final projectId =
+            (app['project_id'] ?? app['projectId'] ?? '').toString();
         if (projectId.isEmpty) continue;
 
         // Buscar proyecto por id real del DDL
-        List<Map<String, dynamic>> projRows = await _roble.db.read('project', filters: {'_id': projectId});
+        List<Map<String, dynamic>> projRows = await _roble.db.read(
+          'project',
+          filters: {'_id': projectId},
+        );
         if (projRows.isEmpty) {
-          projRows = await _roble.db.read('project', filters: {'id': projectId});
+          projRows = await _roble.db.read(
+            'project',
+            filters: {'id': projectId},
+          );
         }
         if (projRows.isEmpty) continue;
         final project = projRows.first;
-        final realId = (project['id'] ?? project['_id'] ?? projectId).toString();
+        final realId =
+            (project['id'] ?? project['_id'] ?? projectId).toString();
 
         if (addedProjectIds.contains(realId)) continue; // ya está como miembro
         addedProjectIds.add(realId);
 
         String authorName = 'Autor';
-        String authorAvatar = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150';
-        final authorId = (project['author_id'] ?? project['authorId'])?.toString();
+        String authorAvatar =
+            'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150';
+        final authorId =
+            (project['author_id'] ?? project['authorId'])?.toString();
         if (authorId != null && authorId.isNotEmpty) {
           try {
-            final authorProfiles = await _roble.db.read('collaborator', filters: {'_id': authorId});
-            if (authorProfiles.isNotEmpty) {
-              authorName = authorProfiles.first['name']?.toString() ?? authorName;
-              authorAvatar = (authorProfiles.first['avatar_url'] ?? authorProfiles.first['avatarUrl'])?.toString() ?? authorAvatar;
+            final authorProfile = await _roble.findCollaborator(authorId);
+            if (authorProfile != null) {
+              authorName = authorProfile['name']?.toString() ?? authorName;
+              authorAvatar =
+                  (authorProfile['avatar_url'] ?? authorProfile['avatarUrl'])
+                          ?.toString() ??
+                      authorAvatar;
             }
           } catch (_) {}
         }
 
         final status = app['status']?.toString() ?? 'underReview';
-        final roleLabel = status == 'accepted' ? 'Aceptado' :
-                          status == 'rejected' ? 'Rechazado' : 'Aplicado';
+        final roleLabel = status == 'accepted'
+            ? 'Aceptado'
+            : status == 'rejected'
+                ? 'Rechazado'
+                : 'Aplicado';
 
-        enrolled.add(EnrolledProject(
-          id: realId,
-          title: project['title']?.toString() ?? 'Proyecto sin título',
-          description: project['description']?.toString() ?? '',
-          authorName: authorName,
-          authorAvatarUrl: authorAvatar,
-          role: roleLabel,
-        ));
+        enrolled.add(
+          EnrolledProject(
+            id: realId,
+            title: project['title']?.toString() ?? 'Proyecto sin título',
+            description: project['description']?.toString() ?? '',
+            authorName: authorName,
+            authorAvatarUrl: authorAvatar,
+            role: roleLabel,
+            isMember: false,
+          ),
+        );
       }
     } catch (_) {}
 
     return enrolled;
+  }
+
+  @override
+  Future<void> leaveProject(String projectId) async {
+    final userId = _roble.currentUserId;
+    if (userId.isEmpty) return;
+
+    try {
+      final members = await _roble.db.read(
+        'project_member',
+        filters: {'project_id': projectId, 'collaborator_id': userId},
+      );
+      for (final m in members) {
+        final id = (m['_id'] ?? m['id'])?.toString();
+        if (id != null) {
+          await _roble.db.delete('project_member', id);
+        }
+      }
+    } catch (e) {
+      rethrow;
+    }
   }
 }

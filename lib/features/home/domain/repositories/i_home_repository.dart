@@ -6,4 +6,7 @@ abstract class IHomeRepository {
   Future<CollaboratorProfile> getCollaboratorProfile();
 
   Future<List<EnrolledProject>> getEnrolledProjects();
+
+  /// Abandona un proyecto del que el colaborador es miembro.
+  Future<void> leaveProject(String projectId);
 }

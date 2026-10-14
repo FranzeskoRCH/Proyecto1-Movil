@@ -6,8 +6,14 @@
     flake-utils.url = "github:numtide/flake-utils";
   };
 
-  outputs = { self, nixpkgs, flake-utils }:
-    flake-utils.lib.eachDefaultSystem (system:
+  outputs =
+    {
+      self,
+      nixpkgs,
+      flake-utils,
+    }:
+    flake-utils.lib.eachDefaultSystem (
+      system:
       let
         pkgs = import nixpkgs {
           inherit system;
@@ -18,11 +24,25 @@
         };
 
         androidComposition = pkgs.androidenv.composeAndroidPackages {
-          buildToolsVersions = [ "34.0.0" "35.0.0" "36.0.0" ];
-          platformVersions = [ "34" "35" "36" ];
-          abiVersions = [ "x86_64" "arm64-v8a" ];
+          buildToolsVersions = [
+            "34.0.0"
+            "35.0.0"
+            "36.0.0"
+          ];
+          platformVersions = [
+            "34"
+            "35"
+            "36"
+          ];
+          abiVersions = [
+            "x86_64"
+            "arm64-v8a"
+          ];
 
           includeNDK = true;
+          # Version the Android Gradle Plugin asks for when a plugin builds
+          # native code (e.g. ':jni' from flutter_secure_storage).
+          cmakeVersions = [ "3.22.1" ];
 
           includeSystemImages = false;
           includeEmulator = false;

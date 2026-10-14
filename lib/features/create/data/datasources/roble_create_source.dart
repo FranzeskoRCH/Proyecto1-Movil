@@ -28,37 +28,60 @@ class RobleCreateSource with NetworkLoggy implements ICreateSource {
       bytes[6] = (bytes[6] & 0x0f) | 0x40; // Version 4
       bytes[8] = (bytes[8] & 0x3f) | 0x80; // Variant RFC4122
       return [
-        bytes.sublist(0, 4).map((b) => b.toRadixString(16).padLeft(2, '0')).join(),
-        bytes.sublist(4, 6).map((b) => b.toRadixString(16).padLeft(2, '0')).join(),
-        bytes.sublist(6, 8).map((b) => b.toRadixString(16).padLeft(2, '0')).join(),
-        bytes.sublist(8, 10).map((b) => b.toRadixString(16).padLeft(2, '0')).join(),
-        bytes.sublist(10, 16).map((b) => b.toRadixString(16).padLeft(2, '0')).join(),
+        bytes
+            .sublist(0, 4)
+            .map((b) => b.toRadixString(16).padLeft(2, '0'))
+            .join(),
+        bytes
+            .sublist(4, 6)
+            .map((b) => b.toRadixString(16).padLeft(2, '0'))
+            .join(),
+        bytes
+            .sublist(6, 8)
+            .map((b) => b.toRadixString(16).padLeft(2, '0'))
+            .join(),
+        bytes
+            .sublist(8, 10)
+            .map((b) => b.toRadixString(16).padLeft(2, '0'))
+            .join(),
+        bytes
+            .sublist(10, 16)
+            .map((b) => b.toRadixString(16).padLeft(2, '0'))
+            .join(),
       ].join('-');
     }
 
     final projectId = generateUuidV4();
 
-    loggy.info('[ROBLE_CREATE] Insertando proyecto en tabla project: "$title" (ID: $projectId, Autor: $userId)');
+    loggy.info(
+        '[ROBLE_CREATE] Insertando proyecto en tabla project: "$title" (ID: $projectId, Autor: $userId)');
     try {
-      // 0. Garantizar que el autor exista en la tabla collaborator (requisito de fk_project_author)
+      // 0. Garantizar que el autor exista en la tabla collaborator (requisito
+      //    de fk_project_author). En Roble el UUID del usuario vive en
+      //    collaborator.id, no en _id; findCollaborator consulta por ambos.
       try {
-        final existingCollabs = await _roble.db.read('collaborator', filters: {'_id': userId});
-        if (existingCollabs.isEmpty) {
-          loggy.info('[ROBLE_CREATE] Creando registro de autor en collaborator para $userId...');
+        final existing = await _roble.findCollaborator(userId);
+        if (existing == null) {
+          loggy.info(
+              '[ROBLE_CREATE] Creando registro de autor en collaborator para $userId...');
           final cached = _roble.cachedUser;
           final authorName = (cached?['name'] ?? 'Colaborador').toString();
           final authorCareer = (cached?['career'] ?? 'Estudiante').toString();
-          final authorAvatar = (cached?['avatar_url'] ?? cached?['avatarUrl'] ?? fallbackImage).toString();
+          final authorAvatar =
+              (cached?['avatar_url'] ?? cached?['avatarUrl'] ?? fallbackImage)
+                  .toString();
           await _roble.db.create('collaborator', {
             'id': userId,
             'name': authorName,
             'career': authorCareer,
             'avatar_url': authorAvatar,
           });
-          loggy.info('[ROBLE_CREATE] Autor registrado exitosamente en collaborator.');
+          loggy.info(
+              '[ROBLE_CREATE] Autor registrado exitosamente en collaborator.');
         }
       } catch (e) {
-        loggy.warning('[ROBLE_CREATE] Advertencia al verificar/crear autor en collaborator: $e');
+        loggy.warning(
+            '[ROBLE_CREATE] Advertencia al verificar/crear autor en collaborator: $e');
       }
 
       // 1. Crear el proyecto en Roble usando snake_case segun el esquema real de la BD
@@ -73,7 +96,8 @@ class RobleCreateSource with NetworkLoggy implements ICreateSource {
         'status': 'recruiting',
       });
 
-      loggy.info('[ROBLE_CREATE] Registro de proyecto creado exitosamente con ID: $projectId');
+      loggy.info(
+          '[ROBLE_CREATE] Registro de proyecto creado exitosamente con ID: $projectId');
 
       // 2. Asociar categorias (campo category_name segun esquema)
       for (final cat in categories) {
@@ -83,9 +107,11 @@ class RobleCreateSource with NetworkLoggy implements ICreateSource {
               'project_id': projectId,
               'category_name': cat.trim(),
             });
-            loggy.info('[ROBLE_CREATE] Categoria asociada: ${cat.trim()} a proyecto $projectId');
+            loggy.info(
+                '[ROBLE_CREATE] Categoria asociada: ${cat.trim()} a proyecto $projectId');
           } catch (e) {
-            loggy.warning('[ROBLE_CREATE] Error al asociar categoria ${cat.trim()}: $e');
+            loggy.warning(
+                '[ROBLE_CREATE] Error al asociar categoria ${cat.trim()}: $e');
           }
         }
       }
@@ -98,9 +124,11 @@ class RobleCreateSource with NetworkLoggy implements ICreateSource {
               'project_id': projectId,
               'role_name': role.trim(),
             });
-            loggy.info('[ROBLE_CREATE] Rol asociado: ${role.trim()} a proyecto $projectId');
+            loggy.info(
+                '[ROBLE_CREATE] Rol asociado: ${role.trim()} a proyecto $projectId');
           } catch (e) {
-            loggy.warning('[ROBLE_CREATE] Error al asociar rol ${role.trim()}: $e');
+            loggy.warning(
+                '[ROBLE_CREATE] Error al asociar rol ${role.trim()}: $e');
           }
         }
       }
@@ -112,4 +140,3 @@ class RobleCreateSource with NetworkLoggy implements ICreateSource {
     return projectId;
   }
 }
-

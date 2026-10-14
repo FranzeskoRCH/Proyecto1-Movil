@@ -32,11 +32,17 @@ class CreateProjectController extends GetxController with UiLoggy {
     'Educación',
   ];
 
+  /// Roles que trae el formulario por defecto (mismos al iniciar y al resetear).
+  static const List<String> _defaultRoles = [
+    'Desarrollo Frontend',
+    'Diseño UI/UX',
+  ];
+
   @override
   void onInit() {
     super.onInit();
     selectedCategories.add('Tech');
-    requiredRoles.addAll(['Desarrollo Frontend', 'Diseño UI/UX']);
+    requiredRoles.addAll(_defaultRoles);
     loggy.info('[CREATE_PROJECT_CONTROLLER] Inicializado.');
   }
 
@@ -79,14 +85,16 @@ class CreateProjectController extends GetxController with UiLoggy {
   void incrementVacancies() {
     if (vacancies.value < 20) {
       vacancies.value++;
-      loggy.info('[CREATE_PROJECT_CONTROLLER] Vacantes incrementadas a: ${vacancies.value}');
+      loggy.info(
+          '[CREATE_PROJECT_CONTROLLER] Vacantes incrementadas a: ${vacancies.value}');
     }
   }
 
   void decrementVacancies() {
     if (vacancies.value > 1) {
       vacancies.value--;
-      loggy.info('[CREATE_PROJECT_CONTROLLER] Vacantes reducidas a: ${vacancies.value}');
+      loggy.info(
+          '[CREATE_PROJECT_CONTROLLER] Vacantes reducidas a: ${vacancies.value}');
     }
   }
 
@@ -97,7 +105,7 @@ class CreateProjectController extends GetxController with UiLoggy {
     roleInputController.clear();
     imageUrlController.clear();
     selectedCategories.assignAll(['Tech']);
-    requiredRoles.assignAll(['Desarrollador', 'Diseñador']);
+    requiredRoles.assignAll(_defaultRoles);
     vacancies.value = 2;
     loggy.info('[CREATE_PROJECT_CONTROLLER] Formulario reseteado.');
   }
@@ -139,7 +147,8 @@ class CreateProjectController extends GetxController with UiLoggy {
       return false;
     }
 
-    loggy.info('[CREATE_PROJECT_CONTROLLER] Enviando nuevo proyecto: "$title" con ${requiredRoles.length} roles');
+    loggy.info(
+        '[CREATE_PROJECT_CONTROLLER] Enviando nuevo proyecto: "$title" con ${requiredRoles.length} roles');
     isLoading.value = true;
     try {
       final projectId = await repository.createProject(
@@ -154,7 +163,8 @@ class CreateProjectController extends GetxController with UiLoggy {
             : null,
       );
 
-      loggy.info('[CREATE_PROJECT_CONTROLLER] Proyecto creado exitosamente con ID: $projectId');
+      loggy.info(
+          '[CREATE_PROJECT_CONTROLLER] Proyecto creado exitosamente con ID: $projectId');
 
       RobleErrorHandler.showSuccessSnackbar(
         title: 'Proyecto Publicado',
@@ -165,11 +175,13 @@ class CreateProjectController extends GetxController with UiLoggy {
 
       // Refrescar controladores si están instanciados
       if (Get.isRegistered<MyProjectsController>()) {
-        loggy.info('[CREATE_PROJECT_CONTROLLER] Refrescando MyProjectsController...');
+        loggy.info(
+            '[CREATE_PROJECT_CONTROLLER] Refrescando MyProjectsController...');
         Get.find<MyProjectsController>().loadProjects();
       }
       if (Get.isRegistered<ExploreController>()) {
-        loggy.info('[CREATE_PROJECT_CONTROLLER] Refrescando ExploreController...');
+        loggy.info(
+            '[CREATE_PROJECT_CONTROLLER] Refrescando ExploreController...');
         Get.find<ExploreController>().loadProjects();
       }
 

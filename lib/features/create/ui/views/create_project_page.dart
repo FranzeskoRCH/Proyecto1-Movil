@@ -61,7 +61,8 @@ class CreateProjectPage extends StatelessWidget {
                   maxLines: 3,
                   decoration: _buildInputDecoration(
                     label: 'Visión del proyecto',
-                    hint: '¿Cuál es el impacto a largo plazo que buscas alcanzar?',
+                    hint:
+                        '¿Cuál es el impacto a largo plazo que buscas alcanzar?',
                     icon: Icons.remove_red_eye_outlined,
                   ),
                 ),
@@ -82,23 +83,30 @@ class CreateProjectPage extends StatelessWidget {
                     spacing: 8,
                     runSpacing: 8,
                     children: controller.availableCategories.map((cat) {
-                      final isSelected = controller.selectedCategories.contains(cat);
+                      final isSelected =
+                          controller.selectedCategories.contains(cat);
                       return FilterChip(
                         label: Text(cat),
                         selected: isSelected,
                         onSelected: (_) => controller.toggleCategory(cat),
-                        selectedColor: const Color(0xFFFF7043).withValues(alpha: 0.15),
+                        selectedColor:
+                            const Color(0xFFFF7043).withValues(alpha: 0.15),
                         checkmarkColor: const Color(0xFFFF7043),
                         labelStyle: TextStyle(
-                          color: isSelected ? const Color(0xFFFF7043) : const Color(0xFF424242),
-                          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                          color: isSelected
+                              ? const Color(0xFFFF7043)
+                              : const Color(0xFF424242),
+                          fontWeight:
+                              isSelected ? FontWeight.bold : FontWeight.normal,
                           fontSize: 13,
                         ),
                         backgroundColor: Colors.grey.shade100,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                           side: BorderSide(
-                            color: isSelected ? const Color(0xFFFF7043) : Colors.grey.shade300,
+                            color: isSelected
+                                ? const Color(0xFFFF7043)
+                                : Colors.grey.shade300,
                           ),
                         ),
                       );
@@ -127,7 +135,8 @@ class CreateProjectPage extends StatelessWidget {
                     ),
                     const SizedBox(width: 8),
                     IconButton.filled(
-                      onPressed: () => controller.addRole(controller.roleInputController.text),
+                      onPressed: () => controller
+                          .addRole(controller.roleInputController.text),
                       icon: const Icon(Icons.add),
                       style: IconButton.styleFrom(
                         backgroundColor: const Color(0xFFFF7043),
@@ -149,7 +158,8 @@ class CreateProjectPage extends StatelessWidget {
                         label: Text(role),
                         deleteIcon: const Icon(Icons.close, size: 16),
                         onDeleted: () => controller.removeRole(role),
-                        backgroundColor: const Color(0xFFFF7043).withValues(alpha: 0.1),
+                        backgroundColor:
+                            const Color(0xFFFF7043).withValues(alpha: 0.1),
                         labelStyle: const TextStyle(
                           color: Color(0xFFFF7043),
                           fontWeight: FontWeight.w600,
@@ -173,18 +183,26 @@ class CreateProjectPage extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Vacantes disponibles',
-                          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
-                        ),
-                        Text(
-                          'Número de colaboradores buscados',
-                          style: TextStyle(color: Color(0xFF757575), fontSize: 13),
-                        ),
-                      ],
+                    Expanded(
+                      child: const Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Vacantes disponibles',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 15,
+                            ),
+                          ),
+                          Text(
+                            'Número de colaboradores buscados',
+                            style: TextStyle(
+                              color: Color(0xFF757575),
+                              fontSize: 13,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                     Row(
                       children: [
@@ -193,7 +211,8 @@ class CreateProjectPage extends StatelessWidget {
                           icon: const Icon(Icons.remove),
                           style: IconButton.styleFrom(
                             side: const BorderSide(color: Color(0xFFE0D8CF)),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10)),
                           ),
                         ),
                         Padding(
@@ -214,7 +233,8 @@ class CreateProjectPage extends StatelessWidget {
                           icon: const Icon(Icons.add),
                           style: IconButton.styleFrom(
                             side: const BorderSide(color: Color(0xFFE0D8CF)),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10)),
                           ),
                         ),
                       ],
@@ -229,7 +249,9 @@ class CreateProjectPage extends StatelessWidget {
                 () => SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
-                    onPressed: controller.isLoading.value ? null : controller.submitProject,
+                    onPressed: controller.isLoading.value
+                        ? null
+                        : controller.submitProject,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFFFF7043),
                       foregroundColor: Colors.white,
@@ -243,11 +265,13 @@ class CreateProjectPage extends StatelessWidget {
                         ? const SizedBox(
                             height: 22,
                             width: 22,
-                            child: CircularProgressIndicator(strokeWidth: 2.5, color: Colors.white),
+                            child: CircularProgressIndicator(
+                                strokeWidth: 2.5, color: Colors.white),
                           )
                         : const Text(
                             'Publicar Proyecto',
-                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                            style: TextStyle(
+                                fontSize: 16, fontWeight: FontWeight.bold),
                           ),
                   ),
                 ),

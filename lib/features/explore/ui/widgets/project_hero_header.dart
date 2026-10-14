@@ -7,10 +7,12 @@ class ProjectHeroHeader extends StatelessWidget {
     super.key,
     required this.onBack,
     this.imageUrl,
+    this.onShare,
   });
 
   final String? imageUrl;
   final VoidCallback onBack;
+  final VoidCallback? onShare;
 
   @override
   Widget build(BuildContext context) {
@@ -59,6 +61,33 @@ class ProjectHeroHeader extends StatelessWidget {
             ),
           ),
         ),
+        if (onShare != null)
+          Positioned(
+            top: MediaQuery.paddingOf(context).top + 10,
+            right: 16,
+            child: GestureDetector(
+              onTap: onShare,
+              child: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Color(0x1A000000),
+                      blurRadius: 8,
+                      offset: Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: const Icon(
+                  Icons.share_outlined,
+                  size: 20,
+                  color: Color(0xFF2B2B2B),
+                ),
+              ),
+            ),
+          ),
       ],
     );
   }

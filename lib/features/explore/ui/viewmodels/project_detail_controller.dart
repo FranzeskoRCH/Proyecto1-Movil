@@ -10,12 +10,14 @@ class ProjectDetailController extends GetxController with UiLoggy {
   final IExploreRepository repository;
 
   final _project = Rxn<Project>();
+  final _selectedRole = RxnString();
   final _isLoading = false.obs;
   final _isSubmitting = false.obs;
 
   ProjectDetailController(this.repository);
 
   Project? get project => _project.value;
+  String? get selectedRole => _selectedRole.value;
   bool get isLoading => _isLoading.value;
   bool get isSubmitting => _isSubmitting.value;
 
@@ -23,15 +25,34 @@ class ProjectDetailController extends GetxController with UiLoggy {
   Future<void> loadProject(String id) async {
     loggy.debug('ProjectDetailController: Fetching project $id');
     _isLoading.value = true;
+    // Limpiar el proyecto anterior para no mostrar por un instante los datos
+    // del proyecto previamente abierto (el controlador es un singleton).
+    _project.value = null;
+    _selectedRole.value = null;
     try {
-      _project.value = await repository.getProjectById(id);
+      final project = await repository.getProjectById(id);
+      _project.value = project;
+      _selectedRole.value = _defaultRole(project);
     } catch (exception) {
-      loggy.error('ProjectDetailController: Error fetching project: $exception');
+      loggy
+          .error('ProjectDetailController: Error fetching project: $exception');
       _project.value = null;
+      _selectedRole.value = null;
     } finally {
       _isLoading.value = false;
     }
   }
+
+  /// Preselecciona el primer rol del que el usuario ya cumple el requisito.
+  String? _defaultRole(Project project) {
+    if (project.roles.isEmpty) return null;
+    for (final role in project.roles) {
+      if (role.hasSkill) return role.name;
+    }
+    return null;
+  }
+
+  void selectRole(String role) => _selectedRole.value = role;
 
   /// Envía la solicitud para unirse al equipo. Devuelve `true` si fue exitosa.
   Future<bool> requestToJoin() async {
@@ -40,7 +61,7 @@ class ProjectDetailController extends GetxController with UiLoggy {
 
     _isSubmitting.value = true;
     try {
-      await repository.requestToJoin(current.id);
+      await repository.requestToJoin(current.id, role: _selectedRole.value);
       current.requestedToJoin = true;
       _project.refresh();
       return true;

@@ -4,11 +4,16 @@ import '../models/project.dart';
 abstract class IExploreRepository {
   Future<List<String>> getCategories();
 
-  Future<List<Project>> getProjects({String? category});
+  Future<List<Project>> getProjects({
+    String? category,
+    String? search,
+    int limit = 20,
+    int offset = 0,
+  });
 
   Future<Project> getProjectById(String id);
 
-  Future<void> requestToJoin(String projectId);
+  Future<void> requestToJoin(String projectId, {String? role});
 
   Future<void> cancelRequest(String projectId);
 }

@@ -12,16 +12,26 @@ class ExploreRepository implements IExploreRepository {
   Future<List<String>> getCategories() async => await source.getCategories();
 
   @override
-  Future<List<Project>> getProjects({String? category}) async =>
-      await source.getProjects(category: category);
+  Future<List<Project>> getProjects({
+    String? category,
+    String? search,
+    int limit = 20,
+    int offset = 0,
+  }) async =>
+      await source.getProjects(
+        category: category,
+        search: search,
+        limit: limit,
+        offset: offset,
+      );
 
   @override
   Future<Project> getProjectById(String id) async =>
       await source.getProjectById(id);
 
   @override
-  Future<void> requestToJoin(String projectId) async =>
-      await source.requestToJoin(projectId);
+  Future<void> requestToJoin(String projectId, {String? role}) async =>
+      await source.requestToJoin(projectId, role: role);
 
   @override
   Future<void> cancelRequest(String projectId) async =>

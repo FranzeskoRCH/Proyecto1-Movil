@@ -1,12 +1,12 @@
 import '../../../domain/models/project.dart';
 import '../i_explore_source.dart';
 
-/// Fuente de datos activa mientras no exista backend.
+/// Fuente de datos local (offline).
 ///
 /// Devuelve proyectos simulando la respuesta de la API. Mantiene el estado de
 /// las solicitudes en memoria para que "Solicitar" y "Cancelar" se comporten
-/// como lo haría el backend. Cuando exista un backend real, esta clase se
-/// reemplaza por [RemoteExploreSource] en `explore_dependencies.dart`.
+/// como lo haría el backend. [RobleExploreSource] la usa como respaldo cuando
+/// falla la lectura contra Roble, y las pruebas la usan como doble.
 class LocalExploreSource implements IExploreSource {
   LocalExploreSource() : _projects = _seedProjects();
 
@@ -29,31 +29,59 @@ class LocalExploreSource implements IExploreSource {
   }
 
   @override
-  Future<List<Project>> getProjects({String? category}) async {
-    if (category == null || category == _forYouCategory) {
-      return List<Project>.unmodifiable(_projects);
+  Future<List<Project>> getProjects({
+    String? category,
+    String? search,
+    int limit = 20,
+    int offset = 0,
+  }) async {
+    Iterable<Project> result = _projects;
+
+    if (category != null && category != _forYouCategory) {
+      result = result.where((project) => project.categories.contains(category));
     }
-    return List<Project>.unmodifiable(
-      _projects.where((project) => project.categories.contains(category)),
-    );
+
+    final term = search?.trim().toLowerCase() ?? '';
+    if (term.isNotEmpty) {
+      result = result.where(
+        (project) =>
+            project.title.toLowerCase().contains(term) ||
+            project.categories.any((c) => c.toLowerCase().contains(term)) ||
+            project.roles.any((r) => r.name.toLowerCase().contains(term)),
+      );
+    }
+
+    final list = result.toList();
+    final start = offset.clamp(0, list.length);
+    final end = (start + limit).clamp(start, list.length);
+    return List<Project>.unmodifiable(list.sublist(start, end));
   }
 
   @override
   Future<Project> getProjectById(String id) async {
-    return _projects.firstWhere((project) => project.id == id);
+    return _projects.firstWhere(
+      (project) => project.id == id,
+      orElse: () => throw Exception('Proyecto no encontrado: $id'),
+    );
   }
 
   @override
-  Future<void> requestToJoin(String projectId) async {
+  Future<void> requestToJoin(String projectId, {String? role}) async {
     _projects
-        .firstWhere((project) => project.id == projectId)
+        .firstWhere(
+          (project) => project.id == projectId,
+          orElse: () => throw Exception('Proyecto no encontrado: $projectId'),
+        )
         .requestedToJoin = true;
   }
 
   @override
   Future<void> cancelRequest(String projectId) async {
     _projects
-        .firstWhere((project) => project.id == projectId)
+        .firstWhere(
+          (project) => project.id == projectId,
+          orElse: () => throw Exception('Proyecto no encontrado: $projectId'),
+        )
         .requestedToJoin = false;
   }
 

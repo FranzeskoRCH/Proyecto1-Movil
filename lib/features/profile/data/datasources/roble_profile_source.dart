@@ -1,54 +1,80 @@
 import 'package:movil_proyecto/core/roble_service.dart';
 import 'package:movil_proyecto/features/home/domain/models/collaborator_profile.dart';
+
 import 'i_profile_source.dart';
 
 class RobleProfileSource implements IProfileSource {
   final RobleService _roble = RobleService();
 
+  static const String _defaultAvatar =
+      'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150';
+
   @override
   Future<CollaboratorProfile> getProfile() async {
-    final userId = _roble.currentUserId;
     final cached = _roble.cachedUser;
+    return _readProfile(
+      _roble.currentUserId,
+      defaultName: cached?['name']?.toString() ?? 'Colaborador',
+      defaultAvatar:
+          (cached?['avatar_url'] ?? cached?['avatarUrl'])?.toString(),
+      defaultCareer: cached?['career']?.toString(),
+    );
+  }
 
-    String name = cached?['name'] ?? 'Colaborador';
-    String avatarUrl = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150';
-    String career = 'Estudiante';
+  @override
+  Future<CollaboratorProfile> getCollaborator(String userId) {
+    return _readProfile(userId);
+  }
+
+  Future<CollaboratorProfile> _readProfile(
+    String userId, {
+    String defaultName = 'Colaborador',
+    String? defaultAvatar,
+    String? defaultCareer,
+  }) async {
+    String name = defaultName;
+    String avatarUrl = defaultAvatar ?? _defaultAvatar;
+    String career = defaultCareer ?? 'Estudiante';
     List<String> skills = [];
     List<String> interests = [];
 
     try {
       if (userId.isNotEmpty) {
-        // En Roble, _id de collaborator es el UUID del usuario
-        final profiles = await _roble.db.read('collaborator', filters: {'_id': userId});
-        if (profiles.isNotEmpty) {
-          final p = profiles.first;
+        // En Roble el UUID del usuario vive en collaborator.id
+        final p = await _roble.findCollaborator(userId);
+        if (p != null) {
           name = p['name']?.toString() ?? name;
-          avatarUrl = (p['avatar_url'] ?? p['avatarUrl'])?.toString() ?? avatarUrl;
+          avatarUrl =
+              (p['avatar_url'] ?? p['avatarUrl'])?.toString() ?? avatarUrl;
           career = p['career']?.toString() ?? career;
         }
 
-        final skillsData = await _roble.db.read('collaborator_skill', filters: {'collaborator_id': userId});
-        final dbSkills = skillsData
-            .map((s) => (s['skill_name'] ?? s['skillName'] ?? s['name'] ?? '').toString())
+        final skillsData = await _roble.db.read(
+          'collaborator_skill',
+          filters: {'collaborator_id': userId},
+        );
+        skills = skillsData
+            .map(
+              (s) => (s['skill_name'] ?? s['skillName'] ?? s['name'] ?? '')
+                  .toString(),
+            )
             .where((s) => s.isNotEmpty)
             .toList();
-        if (dbSkills.isNotEmpty) skills = dbSkills;
 
-        final interestsData = await _roble.db.read('collaborator_interest', filters: {'collaborator_id': userId});
-        final dbInterests = interestsData
-            .map((i) => (i['interest_name'] ?? i['interestName'] ?? i['name'] ?? '').toString())
+        final interestsData = await _roble.db.read(
+          'collaborator_interest',
+          filters: {'collaborator_id': userId},
+        );
+        interests = interestsData
+            .map(
+              (i) =>
+                  (i['interest_name'] ?? i['interestName'] ?? i['name'] ?? '')
+                      .toString(),
+            )
             .where((i) => i.isNotEmpty)
             .toList();
-        if (dbInterests.isNotEmpty) interests = dbInterests;
       }
     } catch (_) {}
-
-    if (skills.isEmpty) {
-      skills = ['Flutter', 'Figma', 'Python', 'Trabajo en equipo'];
-    }
-    if (interests.isEmpty) {
-      interests = ['Tecnología', 'Innovación Social', 'Medio Ambiente'];
-    }
 
     return CollaboratorProfile(
       name: name,
@@ -69,9 +95,9 @@ class RobleProfileSource implements IProfileSource {
     if (userId.isEmpty) return;
 
     try {
-      final profiles = await _roble.db.read('collaborator', filters: {'_id': userId});
-      if (profiles.isNotEmpty) {
-        final profileId = (profiles.first['_id'] ?? profiles.first['id']).toString();
+      final existing = await _roble.findCollaborator(userId);
+      if (existing != null) {
+        final profileId = (existing['_id'] ?? existing['id']).toString();
         await _roble.db.update('collaborator', profileId, {
           'name': name,
           'career': career,
@@ -85,7 +111,11 @@ class RobleProfileSource implements IProfileSource {
           'avatar_url': avatarUrl,
         });
       }
-      _roble.updateCachedUser({'name': name, 'avatar_url': avatarUrl, 'career': career});
+      _roble.updateCachedUser({
+        'name': name,
+        'avatar_url': avatarUrl,
+        'career': career,
+      });
     } catch (e) {
       rethrow;
     }
@@ -108,10 +138,10 @@ class RobleProfileSource implements IProfileSource {
     final userId = _roble.currentUserId;
     if (userId.isEmpty) return;
     try {
-      final records = await _roble.db.read('collaborator_skill', filters: {
-        'collaborator_id': userId,
-        'skill_name': skill.trim(),
-      });
+      final records = await _roble.db.read(
+        'collaborator_skill',
+        filters: {'collaborator_id': userId, 'skill_name': skill.trim()},
+      );
       for (final r in records) {
         final id = (r['_id'] ?? r['id'])?.toString();
         if (id != null) {
@@ -138,10 +168,10 @@ class RobleProfileSource implements IProfileSource {
     final userId = _roble.currentUserId;
     if (userId.isEmpty) return;
     try {
-      final records = await _roble.db.read('collaborator_interest', filters: {
-        'collaborator_id': userId,
-        'interest_name': interest.trim(),
-      });
+      final records = await _roble.db.read(
+        'collaborator_interest',
+        filters: {'collaborator_id': userId, 'interest_name': interest.trim()},
+      );
       for (final r in records) {
         final id = (r['_id'] ?? r['id'])?.toString();
         if (id != null) {
@@ -152,33 +182,40 @@ class RobleProfileSource implements IProfileSource {
   }
 
   @override
-  Future<Map<String, int>> getStats() async {
-    final userId = _roble.currentUserId;
+  Future<Map<String, int>> getStats() => getStatsFor(_roble.currentUserId);
+
+  @override
+  Future<Map<String, int>> getStatsFor(String userId) async {
     int created = 0;
     int member = 0;
     int applied = 0;
 
     if (userId.isNotEmpty) {
       try {
-        final createdRows = await _roble.db.read('project', filters: {'author_id': userId});
+        final createdRows = await _roble.db.read(
+          'project',
+          filters: {'author_id': userId},
+        );
         created = createdRows.length;
       } catch (_) {}
 
       try {
-        final memberRows = await _roble.db.read('project_member', filters: {'collaborator_id': userId});
+        final memberRows = await _roble.db.read(
+          'project_member',
+          filters: {'collaborator_id': userId},
+        );
         member = memberRows.length;
       } catch (_) {}
 
       try {
-        final appRows = await _roble.db.read('application', filters: {'applicant_id': userId});
+        final appRows = await _roble.db.read(
+          'application',
+          filters: {'applicant_id': userId},
+        );
         applied = appRows.length;
       } catch (_) {}
     }
 
-    return {
-      'created': created,
-      'member': member,
-      'applied': applied,
-    };
+    return {'created': created, 'member': member, 'applied': applied};
   }
 }

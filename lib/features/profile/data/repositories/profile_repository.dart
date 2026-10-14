@@ -1,4 +1,5 @@
 import 'package:movil_proyecto/features/home/domain/models/collaborator_profile.dart';
+
 import '../../domain/repositories/i_profile_repository.dart';
 import '../datasources/i_profile_source.dart';
 
@@ -10,6 +11,11 @@ class ProfileRepository implements IProfileRepository {
   @override
   Future<CollaboratorProfile> getProfile() {
     return source.getProfile();
+  }
+
+  @override
+  Future<CollaboratorProfile> getCollaborator(String userId) {
+    return source.getCollaborator(userId);
   }
 
   @override
@@ -48,5 +54,10 @@ class ProfileRepository implements IProfileRepository {
   @override
   Future<Map<String, int>> getStats() {
     return source.getStats();
+  }
+
+  @override
+  Future<Map<String, int>> getStatsFor(String userId) {
+    return source.getStatsFor(userId);
   }
 }

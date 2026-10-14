@@ -1,88 +1,35 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../../../core/widgets/app_confirm_dialog.dart';
 import '../viewmodels/profile_controller.dart';
 import 'edit_profile_page.dart';
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
 
-  void _showAddDialog({
-    required BuildContext context,
+  Future<void> _showAddDialog({
     required String title,
     required String hint,
     required Function(String) onAdd,
-  }) {
-    final textController = TextEditingController();
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-        content: TextField(
-          controller: textController,
-          autofocus: true,
-          decoration: InputDecoration(
-            hintText: hint,
-            filled: true,
-            fillColor: Colors.grey.shade100,
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide.none,
-            ),
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('Cancelar', style: TextStyle(color: Colors.grey)),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              final val = textController.text.trim();
-              if (val.isNotEmpty) {
-                onAdd(val);
-                Navigator.of(ctx).pop();
-              }
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFFF7043),
-              foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-            ),
-            child: const Text('Agregar'),
-          ),
-        ],
-      ),
+  }) async {
+    final value = await showAppInputDialog(
+      title: title,
+      hint: hint,
+      confirmText: 'Agregar',
+      icon: Icons.add_circle_outline,
     );
+    if (value != null) onAdd(value);
   }
 
-  void _showLogoutDialog(BuildContext context, ProfileController controller) {
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text('Cerrar Sesión', style: TextStyle(fontWeight: FontWeight.bold)),
-        content: const Text('¿Estás seguro de que deseas salir de tu cuenta?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('Cancelar', style: TextStyle(color: Colors.grey)),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.of(ctx).pop();
-              controller.logout();
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.redAccent,
-              foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-            ),
-            child: const Text('Salir'),
-          ),
-        ],
-      ),
+  Future<void> _showLogoutDialog(ProfileController controller) async {
+    final confirmed = await showAppConfirmDialog(
+      title: 'Cerrar sesión',
+      message: '¿Estás seguro de que deseas salir de tu cuenta?',
+      confirmText: 'Salir',
+      confirmColor: const Color(0xFFD32F2F),
+      icon: Icons.logout_rounded,
     );
+    if (confirmed) controller.logout();
   }
 
   @override
@@ -133,10 +80,14 @@ class ProfilePage extends StatelessWidget {
                       children: [
                         CircleAvatar(
                           radius: 46,
-                          backgroundColor: const Color(0xFFFF7043).withValues(alpha: 0.2),
-                          backgroundImage: avatarUrl.isNotEmpty ? NetworkImage(avatarUrl) : null,
+                          backgroundColor:
+                              const Color(0xFFFF7043).withValues(alpha: 0.2),
+                          backgroundImage: avatarUrl.isNotEmpty
+                              ? NetworkImage(avatarUrl)
+                              : null,
                           child: avatarUrl.isEmpty
-                              ? const Icon(Icons.person, size: 48, color: Color(0xFFFF7043))
+                              ? const Icon(Icons.person,
+                                  size: 48, color: Color(0xFFFF7043))
                               : null,
                         ),
                         const SizedBox(height: 14),
@@ -160,7 +111,8 @@ class ProfilePage extends StatelessWidget {
                         ),
                         const SizedBox(height: 16),
                         OutlinedButton.icon(
-                          onPressed: () => Get.to(() => const EditProfilePage()),
+                          onPressed: () =>
+                              Get.to(() => const EditProfilePage()),
                           icon: const Icon(Icons.edit_outlined, size: 16),
                           label: const Text('Editar Perfil'),
                           style: OutlinedButton.styleFrom(
@@ -179,7 +131,8 @@ class ProfilePage extends StatelessWidget {
                   // Estadísticas
                   Container(
                     width: double.infinity,
-                    padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 16, horizontal: 12),
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(18),
@@ -194,11 +147,14 @@ class ProfilePage extends StatelessWidget {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
-                        _buildStatItem('Creados', controller.stats['created'] ?? 0),
+                        _buildStatItem(
+                            'Creados', controller.stats['created'] ?? 0),
                         _buildDivider(),
-                        _buildStatItem('Miembro', controller.stats['member'] ?? 0),
+                        _buildStatItem(
+                            'Miembro', controller.stats['member'] ?? 0),
                         _buildDivider(),
-                        _buildStatItem('Postulado', controller.stats['applied'] ?? 0),
+                        _buildStatItem(
+                            'Postulado', controller.stats['applied'] ?? 0),
                       ],
                     ),
                   ),
@@ -210,7 +166,6 @@ class ProfilePage extends StatelessWidget {
                     icon: Icons.psychology_outlined,
                     items: skills,
                     onAddTap: () => _showAddDialog(
-                      context: context,
                       title: 'Nueva Habilidad',
                       hint: 'Ej. Flutter, Figma, Python...',
                       onAdd: controller.addSkill,
@@ -225,7 +180,6 @@ class ProfilePage extends StatelessWidget {
                     icon: Icons.star_border_rounded,
                     items: interests,
                     onAddTap: () => _showAddDialog(
-                      context: context,
                       title: 'Nuevo Interés',
                       hint: 'Ej. Inteligencia Artificial, Sostenibilidad...',
                       onAdd: controller.addInterest,
@@ -238,7 +192,7 @@ class ProfilePage extends StatelessWidget {
                   SizedBox(
                     width: double.infinity,
                     child: TextButton.icon(
-                      onPressed: () => _showLogoutDialog(context, controller),
+                      onPressed: () => _showLogoutDialog(controller),
                       icon: const Icon(Icons.logout, color: Colors.redAccent),
                       label: const Text(
                         'Cerrar Sesión',
@@ -252,7 +206,8 @@ class ProfilePage extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(vertical: 14),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(14),
-                          side: BorderSide(color: Colors.redAccent.withValues(alpha: 0.3)),
+                          side: BorderSide(
+                              color: Colors.redAccent.withValues(alpha: 0.3)),
                         ),
                       ),
                     ),
@@ -342,7 +297,8 @@ class ProfilePage extends StatelessWidget {
               ),
               IconButton(
                 onPressed: onAddTap,
-                icon: const Icon(Icons.add_circle_outline, color: Color(0xFFFF7043)),
+                icon: const Icon(Icons.add_circle_outline,
+                    color: Color(0xFFFF7043)),
                 tooltip: 'Agregar',
               ),
             ],
@@ -365,7 +321,8 @@ class ProfilePage extends StatelessWidget {
                   label: Text(item),
                   deleteIcon: const Icon(Icons.close, size: 16),
                   onDeleted: () => onDeleteTap(item),
-                  backgroundColor: const Color(0xFFFF7043).withValues(alpha: 0.08),
+                  backgroundColor:
+                      const Color(0xFFFF7043).withValues(alpha: 0.08),
                   labelStyle: const TextStyle(
                     color: Color(0xFFFF7043),
                     fontWeight: FontWeight.w600,

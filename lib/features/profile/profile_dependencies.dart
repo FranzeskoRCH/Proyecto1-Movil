@@ -1,8 +1,10 @@
 import 'package:get/get.dart';
+
 import 'data/datasources/i_profile_source.dart';
 import 'data/datasources/roble_profile_source.dart';
 import 'data/repositories/profile_repository.dart';
 import 'domain/repositories/i_profile_repository.dart';
+import 'ui/viewmodels/collaborator_profile_controller.dart';
 import 'ui/viewmodels/profile_controller.dart';
 
 void registerProfile() {
@@ -13,6 +15,10 @@ void registerProfile() {
   );
   Get.lazyPut(
     () => ProfileController(Get.find<IProfileRepository>()),
+    fenix: true,
+  );
+  Get.lazyPut(
+    () => CollaboratorProfileController(Get.find<IProfileRepository>()),
     fenix: true,
   );
 }

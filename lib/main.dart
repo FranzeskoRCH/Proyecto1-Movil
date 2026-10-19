@@ -12,6 +12,7 @@ import 'features/explore/explore_dependencies.dart';
 import 'features/home/home_dependencies.dart';
 import 'features/profile/profile_dependencies.dart';
 import 'features/project/project_dependencies.dart';
+import 'features/workspace/workspace_dependencies.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -30,6 +31,7 @@ void main() async {
   registerProject();
   registerCreate();
   registerProfile();
+  registerWorkspace();
 
   runApp(const MyApp());
 }

@@ -1,7 +1,4 @@
-import 'dart:convert';
-import 'dart:io';
-
-import 'package:movil_proyecto/core/roble_constants.dart';
+import 'package:loggy/loggy.dart';
 import 'package:movil_proyecto/core/roble_service.dart';
 import 'package:movil_proyecto/features/project/domain/models/applicant.dart';
 import 'package:movil_proyecto/features/project/domain/models/application_status.dart';
@@ -11,37 +8,66 @@ import 'package:movil_proyecto/features/project/domain/models/created_project.da
 import 'i_project_source.dart';
 import 'local/local_project_source.dart';
 
-class RobleProjectSource implements IProjectSource {
+class RobleProjectSource with NetworkLoggy implements IProjectSource {
   final RobleService _roble = RobleService();
   final LocalProjectSource _fallbackSource = LocalProjectSource();
 
-  /// Helper: realiza un UPDATE en Roble usando el PAT si el token de usuario no tiene permisos RLS
-  Future<void> _updateWithPat(
-    String tableName,
-    String robleId,
-    Map<String, dynamic> updates,
+  /// Consultas guardadas en la consola de Roble. Los permisos por rol de la
+  /// API no dejan al autor leer ni actualizar las filas de `application` que
+  /// crearon otros usuarios; las consultas guardadas sí, y validan en el SQL
+  /// que quien llama sea el autor del proyecto.
+  static const String _applicationsQueryName = 'postulaciones_de_proyecto';
+  static const String _respondQueryName = 'responder_postulacion';
+
+  /// `collaborator_id` de cada postulación cargada (`_id` de application →
+  /// usuario), para aceptar sin tener que volver a leer `application`.
+  final Map<String, String> _collaboratorByApplication = {};
+
+  /// Postulaciones de un proyecto. Intenta la consulta guardada y, si no
+  /// existe, lee la tabla directamente (solo funciona si el rol lo permite).
+  Future<List<Map<String, dynamic>>> _readApplications(
+    String projectId,
   ) async {
     try {
-      final client = HttpClient();
-      final uri = Uri.parse(
-        '${RobleConstants.baseUrl}/database/${RobleConstants.contractId}/update',
+      final result = await _roble.db.executeQueryByName(
+        _applicationsQueryName,
+        params: [projectId, _roble.currentUserId],
       );
-      final req = await client.putUrl(uri);
-      req.headers.set('Authorization', 'Bearer ${RobleConstants.projectToken}');
-      req.headers.set('Content-Type', 'application/json');
-      req.add(
-        utf8.encode(
-          jsonEncode({
-            'tableName': tableName,
-            'idColumn': '_id',
-            'idValue': robleId,
-            'updates': updates,
-          }),
-        ),
+      return result.rows
+          .whereType<Map>()
+          .map((row) => Map<String, dynamic>.from(row))
+          .toList();
+    } catch (e) {
+      loggy.warning(
+        '[ROBLE_PROJECT] Consulta guardada "$_applicationsQueryName" no '
+        'disponible ($e); leyendo la tabla application.',
       );
-      await req.close();
-      client.close();
-    } catch (_) {}
+    }
+    return _roble.db.read('application', filters: {'project_id': projectId});
+  }
+
+  /// Cambia el estado de una postulación (`accepted` / `rejected`).
+  ///
+  /// Primero por la consulta guardada; si no existe, con `update` directo.
+  /// Si ambos fallan, el error se propaga para no mostrar un éxito falso.
+  Future<void> _setApplicationStatus(String applicationId, String status) async {
+    try {
+      final result = await _roble.db.executeQueryByName(
+        _respondQueryName,
+        params: [applicationId, status, _roble.currentUserId],
+      );
+      if (result.rows.isNotEmpty) return;
+      loggy.warning(
+        '[ROBLE_PROJECT] "$_respondQueryName" no actualizó ninguna fila '
+        '($applicationId); probando update directo.',
+      );
+    } catch (e) {
+      loggy.warning(
+        '[ROBLE_PROJECT] Consulta guardada "$_respondQueryName" no '
+        'disponible ($e); probando update directo.',
+      );
+    }
+    await _roble.db.update('application', applicationId, {'status': status});
   }
 
   /// Helper: obtiene un registro por su id (busca por _id interno de Roble y por id real del DDL).
@@ -227,21 +253,28 @@ class RobleProjectSource implements IProjectSource {
           }
         } catch (_) {}
 
-        // 2. Leer postulantes de la tabla 'application'
+        // 2. Leer postulantes (consulta guardada o tabla 'application')
         try {
-          final appRows = await _roble.db.read(
-            'application',
-            filters: {'project_id': projectId},
+          final appRows = await _readApplications(projectId);
+          loggy.info(
+            '[ROBLE_PROJECT] Proyecto $projectId: ${appRows.length} '
+            'postulaciones leídas, ${acceptedCollabIds.length} miembros.',
           );
           for (final a in appRows) {
             final applicantCollabId =
                 (a['applicant_id'] ?? a['applicantId'] ?? '').toString();
-            String name = 'Postulante';
-            String avatarUrl =
+            final applicationId = (a['_id'] ?? a['id'] ?? '').toString();
+            if (applicationId.isNotEmpty && applicantCollabId.isNotEmpty) {
+              _collaboratorByApplication[applicationId] = applicantCollabId;
+            }
+            // La consulta guardada ya trae el perfil del postulante.
+            final joinedName = a['applicant_name']?.toString();
+            String name = joinedName ?? 'Postulante';
+            String avatarUrl = a['applicant_avatar_url']?.toString() ??
                 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150';
-            String career = 'Estudiante';
+            String career = a['applicant_career']?.toString() ?? 'Estudiante';
 
-            if (applicantCollabId.isNotEmpty) {
+            if (joinedName == null && applicantCollabId.isNotEmpty) {
               try {
                 final profile = await _getById(
                   'collaborator',
@@ -284,7 +317,14 @@ class RobleProjectSource implements IProjectSource {
               ),
             );
           }
-        } catch (_) {}
+        } catch (e) {
+          // Si la política RLS de `application` no deja al autor leer las
+          // postulaciones de sus proyectos, el error termina aquí.
+          loggy.error(
+            '[ROBLE_PROJECT] No se pudieron leer las postulaciones del '
+            'proyecto $projectId: $e',
+          );
+        }
 
         // 3. Agregar miembros de project_member que no estén en la lista de application
         for (final cId in acceptedCollabIds) {
@@ -360,22 +400,25 @@ class RobleProjectSource implements IProjectSource {
 
   @override
   Future<void> acceptApplicant(String projectId, String applicantId) async {
-    String collaboratorId = '';
-    String? applicationRobleId;
+    // El usuario de la postulación ya se conoce si se cargó con el proyecto.
+    String collaboratorId = _collaboratorByApplication[applicantId] ?? '';
+    String? applicationRobleId = collaboratorId.isEmpty ? null : applicantId;
 
-    // Buscar en application por _id
-    try {
-      final apps = await _roble.db.read(
-        'application',
-        filters: {'_id': applicantId},
-      );
-      if (apps.isNotEmpty) {
-        applicationRobleId = apps.first['_id']?.toString();
-        collaboratorId =
-            (apps.first['applicant_id'] ?? apps.first['applicantId'] ?? '')
-                .toString();
-      }
-    } catch (_) {}
+    // Si no, buscar en application por _id
+    if (collaboratorId.isEmpty) {
+      try {
+        final apps = await _roble.db.read(
+          'application',
+          filters: {'_id': applicantId},
+        );
+        if (apps.isNotEmpty) {
+          applicationRobleId = apps.first['_id']?.toString();
+          collaboratorId =
+              (apps.first['applicant_id'] ?? apps.first['applicantId'] ?? '')
+                  .toString();
+        }
+      } catch (_) {}
+    }
 
     // Si no encontró por _id, buscar por id del DDL
     if (collaboratorId.isEmpty) {
@@ -393,8 +436,10 @@ class RobleProjectSource implements IProjectSource {
       } catch (_) {}
     }
 
+    // Sin el usuario no se puede crear el project_member: usar el id de la
+    // postulación como collaborator_id dejaría una fila corrupta.
     if (collaboratorId.isEmpty) {
-      collaboratorId = applicantId;
+      throw Exception('No se encontró la postulación $applicantId.');
     }
 
     // 0. Verificar capacidad: no aceptar por encima de las vacantes.
@@ -407,15 +452,8 @@ class RobleProjectSource implements IProjectSource {
       throw Exception('El proyecto ya alcanzó sus $vacancies vacantes.');
     }
 
-    // 1. Actualizar estado de la aplicacion en DB (con fallback PAT)
-    final targetAppId = applicationRobleId ?? applicantId;
-    try {
-      await _roble.db.update('application', targetAppId, {
-        'status': 'accepted',
-      });
-    } catch (_) {
-      await _updateWithPat('application', targetAppId, {'status': 'accepted'});
-    }
+    // 1. Actualizar estado de la postulación
+    await _setApplicationStatus(applicationRobleId ?? applicantId, 'accepted');
 
     // 2. Insertar en project_member si no existe
     if (!alreadyMember) {
@@ -440,16 +478,20 @@ class RobleProjectSource implements IProjectSource {
 
   @override
   Future<void> rejectApplicant(String projectId, String applicantId) async {
-    String? applicationRobleId;
-    try {
-      final apps = await _roble.db.read(
-        'application',
-        filters: {'_id': applicantId},
-      );
-      if (apps.isNotEmpty) {
-        applicationRobleId = apps.first['_id']?.toString();
-      }
-    } catch (_) {}
+    // Las filas cargadas con el proyecto ya traen el `_id` de la postulación.
+    String? applicationRobleId =
+        _collaboratorByApplication.containsKey(applicantId) ? applicantId : null;
+    if (applicationRobleId == null) {
+      try {
+        final apps = await _roble.db.read(
+          'application',
+          filters: {'_id': applicantId},
+        );
+        if (apps.isNotEmpty) {
+          applicationRobleId = apps.first['_id']?.toString();
+        }
+      } catch (_) {}
+    }
 
     if (applicationRobleId == null) {
       try {
@@ -463,12 +505,7 @@ class RobleProjectSource implements IProjectSource {
       } catch (_) {}
     }
 
-    final targetId = applicationRobleId ?? applicantId;
-    try {
-      await _roble.db.update('application', targetId, {'status': 'rejected'});
-    } catch (_) {
-      await _updateWithPat('application', targetId, {'status': 'rejected'});
-    }
+    await _setApplicationStatus(applicationRobleId ?? applicantId, 'rejected');
   }
 
   @override
@@ -614,6 +651,8 @@ class RobleProjectSource implements IProjectSource {
       'project_role',
       'project_member',
       'application',
+      'project_task',
+      'project_event',
     ]) {
       try {
         final rows = await _roble.db.read(

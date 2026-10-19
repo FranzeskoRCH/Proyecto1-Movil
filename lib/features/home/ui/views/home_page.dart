@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 
 import '../../../../core/widgets/app_confirm_dialog.dart';
 import '../../../../core/widgets/brand_logo.dart';
+import '../../../workspace/ui/views/project_workspace_page.dart';
 import '../../domain/models/enrolled_project.dart';
 import '../viewmodels/home_controller.dart';
 import '../widgets/action_card_row.dart';
@@ -117,6 +118,13 @@ class HomePage extends StatelessWidget {
                   EnrolledProjectCard(
                     project: project,
                     onLeave: () => _confirmLeave(controller, project),
+                    onOpenWorkspace: () => Get.to(
+                      () => ProjectWorkspacePage(
+                        projectId: project.id,
+                        projectTitle: project.title,
+                        isOwner: false,
+                      ),
+                    ),
                   ),
                   const SizedBox(height: 14),
                 ],

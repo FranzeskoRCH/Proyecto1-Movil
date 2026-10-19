@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import '../../../../core/project_share.dart';
 import '../../../../core/widgets/app_confirm_dialog.dart';
 import '../../../../core/widgets/brand_logo.dart';
+import '../../../workspace/ui/views/project_workspace_page.dart';
 import '../../domain/models/applied_project.dart';
 import '../../domain/models/created_project.dart';
 import '../viewmodels/my_projects_controller.dart';
@@ -95,6 +96,17 @@ class MyProjectsPage extends StatelessWidget {
                 controller.loadProjects();
               },
               onDelete: () => _confirmDelete(controller, project),
+              onStartProject: () => _confirmStart(controller, project),
+              onOpenWorkspace: () async {
+                await Get.to(
+                  () => ProjectWorkspacePage(
+                    projectId: project.id,
+                    projectTitle: project.title,
+                    isOwner: true,
+                  ),
+                );
+                controller.loadProjects();
+              },
               onShare: () => shareProject(
                 context,
                 projectId: project.id,
@@ -138,6 +150,20 @@ class MyProjectsPage extends StatelessWidget {
       icon: Icons.undo_rounded,
     );
     if (confirmed) controller.withdrawApplication(project);
+  }
+
+  Future<void> _confirmStart(
+    MyProjectsController controller,
+    CreatedProject project,
+  ) async {
+    final bool confirmed = await showAppConfirmDialog(
+      title: 'Iniciar proyecto',
+      message: '"${project.title}" pasará a estado Activo y se habilitará su '
+          'espacio de trabajo con tareas, calendario y progreso.',
+      confirmText: 'Iniciar',
+      icon: Icons.rocket_launch_outlined,
+    );
+    if (confirmed) controller.startProject(project);
   }
 
   Future<void> _confirmDelete(

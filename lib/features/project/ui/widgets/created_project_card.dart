@@ -12,6 +12,8 @@ class CreatedProjectCard extends StatelessWidget {
     required this.onEdit,
     required this.onDelete,
     required this.onShare,
+    this.onOpenWorkspace,
+    this.onStartProject,
   });
 
   final CreatedProject project;
@@ -19,6 +21,12 @@ class CreatedProjectCard extends StatelessWidget {
   final VoidCallback onEdit;
   final VoidCallback onDelete;
   final VoidCallback onShare;
+
+  /// Abre el espacio de trabajo (tareas, calendario y progreso).
+  final VoidCallback? onOpenWorkspace;
+
+  /// Pasa el proyecto de "Reclutando" a "Activo".
+  final VoidCallback? onStartProject;
 
   @override
   Widget build(BuildContext context) {
@@ -126,6 +134,24 @@ class CreatedProjectCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 16),
+          if (project.status == CreatedProjectStatus.recruiting &&
+              onStartProject != null) ...[
+            _CardAction(
+              label: 'Iniciar proyecto',
+              icon: Icons.rocket_launch_outlined,
+              onTap: onStartProject!,
+              outlined: true,
+            ),
+            const SizedBox(height: 14),
+          ] else if (project.status != CreatedProjectStatus.recruiting &&
+              onOpenWorkspace != null) ...[
+            _CardAction(
+              label: 'Espacio de trabajo',
+              icon: Icons.dashboard_customize_outlined,
+              onTap: onOpenWorkspace!,
+            ),
+            const SizedBox(height: 14),
+          ],
           const Divider(height: 1, thickness: 1, color: Color(0xFFECECEC)),
           const SizedBox(height: 12),
           Row(
@@ -163,6 +189,73 @@ class CreatedProjectCard extends StatelessWidget {
             ],
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// Botón ancho de la tarjeta: en degradado, o con borde si [outlined].
+class _CardAction extends StatelessWidget {
+  const _CardAction({
+    required this.label,
+    required this.icon,
+    required this.onTap,
+    this.outlined = false,
+  });
+
+  final String label;
+  final IconData icon;
+  final VoidCallback onTap;
+  final bool outlined;
+
+  @override
+  Widget build(BuildContext context) {
+    final Color foreground =
+        outlined ? const Color(0xFFF0552F) : Colors.white;
+
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        height: 46,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          gradient: outlined
+              ? null
+              : const LinearGradient(
+                  colors: [Color(0xFFFFA741), Color(0xFFFF5252)],
+                  begin: Alignment.centerLeft,
+                  end: Alignment.centerRight,
+                ),
+          color: outlined ? const Color(0xFFFFF4EF) : null,
+          borderRadius: BorderRadius.circular(30),
+          border: outlined
+              ? Border.all(color: const Color(0xFFFFCCBC), width: 1.2)
+              : null,
+          boxShadow: outlined
+              ? null
+              : const [
+                  BoxShadow(
+                    color: Color(0x33FF5252),
+                    blurRadius: 12,
+                    offset: Offset(0, 5),
+                  ),
+                ],
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, size: 18, color: foreground),
+            const SizedBox(width: 8),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w700,
+                color: foreground,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:movil_proyecto/features/create/ui/views/create_project_page.dart';
 import 'package:movil_proyecto/features/explore/ui/views/explore_projects_page.dart';
 import 'package:movil_proyecto/features/profile/ui/views/profile_page.dart';
+import 'package:movil_proyecto/features/project/ui/viewmodels/my_projects_controller.dart';
 import 'package:movil_proyecto/features/project/ui/views/my_projects_page.dart';
 
 import '../viewmodels/home_controller.dart';
@@ -21,11 +22,19 @@ class MainShell extends StatefulWidget {
 }
 
 class _MainShellState extends State<MainShell> {
+  static const int _projectsIndex = 3;
   static const int _profileIndex = 4;
 
   int _index = 0;
 
-  void _onTabSelected(int index) => setState(() => _index = index);
+  void _onTabSelected(int index) {
+    // Recargar al entrar a "Proyectos" para ver postulaciones nuevas sin
+    // tener que deslizar para refrescar.
+    if (index == _projectsIndex && index != _index) {
+      Get.find<MyProjectsController>().loadProjects();
+    }
+    setState(() => _index = index);
+  }
 
   @override
   Widget build(BuildContext context) {

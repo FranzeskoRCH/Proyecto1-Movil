@@ -4,12 +4,20 @@ import '../../domain/models/enrolled_project.dart';
 
 /// Tarjeta de un proyecto en el que el colaborador ya participa (aceptado).
 class EnrolledProjectCard extends StatelessWidget {
-  const EnrolledProjectCard({super.key, required this.project, this.onLeave});
+  const EnrolledProjectCard({
+    super.key,
+    required this.project,
+    this.onLeave,
+    this.onOpenWorkspace,
+  });
 
   final EnrolledProject project;
 
   /// Si se provee y es miembro, muestra "Salir del equipo".
   final VoidCallback? onLeave;
+
+  /// Si se provee y es miembro, muestra el acceso al espacio de trabajo.
+  final VoidCallback? onOpenWorkspace;
 
   @override
   Widget build(BuildContext context) {
@@ -107,6 +115,50 @@ class EnrolledProjectCard extends StatelessWidget {
                   ),
               ],
             ),
+            if (onOpenWorkspace != null) ...[
+              const SizedBox(height: 14),
+              GestureDetector(
+                onTap: onOpenWorkspace,
+                child: Container(
+                  height: 46,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [Color(0xFFFFA741), Color(0xFFFF5252)],
+                      begin: Alignment.centerLeft,
+                      end: Alignment.centerRight,
+                    ),
+                    borderRadius: BorderRadius.circular(30),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Color(0x33FF5252),
+                        blurRadius: 12,
+                        offset: Offset(0, 5),
+                      ),
+                    ],
+                  ),
+                  child: const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.dashboard_customize_outlined,
+                        size: 18,
+                        color: Colors.white,
+                      ),
+                      SizedBox(width: 8),
+                      Text(
+                        'Espacio de trabajo',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
           ],
         ],
       ),

@@ -111,6 +111,37 @@ class MyProjectsController extends GetxController with UiLoggy {
     }
   }
 
+  /// Pasa un proyecto de "Reclutando" a "Activo" para abrir su espacio de
+  /// trabajo. Devuelve `true` si se guardó.
+  Future<bool> startProject(CreatedProject project) async {
+    try {
+      await repository.updateProject(
+        projectId: project.id,
+        title: project.title,
+        description: project.description,
+        vision: project.vision,
+        vacancies: project.vacancies,
+        status: CreatedProjectStatus.active,
+        categories: project.categories,
+        roles: project.roles,
+        imageUrl: project.imageUrl,
+      );
+      await loadProjects();
+      _refreshExplore();
+      RobleErrorHandler.showSuccessSnackbar(
+        title: '¡Proyecto iniciado!',
+        message: 'Ya puedes organizar tareas y fechas en el espacio de trabajo.',
+      );
+      return true;
+    } catch (e) {
+      RobleErrorHandler.showErrorSnackbar(
+        title: 'No se pudo iniciar el proyecto',
+        error: e,
+      );
+      return false;
+    }
+  }
+
   /// Elimina un proyecto propio y lo quita de la lista de creados.
   Future<bool> deleteProject(CreatedProject project) async {
     try {

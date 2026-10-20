@@ -30,7 +30,7 @@ include(":app")
 // the read-only store, so build that plugin from a writable copy. On machines
 // with a writable SDK this does nothing.
 fun relocateReadOnlyPlugin(path: String) {
-    val plugin = project(path)
+    val plugin = findProject(path) ?: return
     val source = plugin.projectDir
     if (source.canWrite()) return
     val target = rootDir.resolve(".gradle/readonly-plugins/${path.removePrefix(":")}")

@@ -24,3 +24,20 @@ plugins {
 }
 
 include(":app")
+
+// Gradle 9 refuses to configure a project whose directory is not writable.
+// On NixOS the Flutter SDK (and therefore the integration_test plugin) lives in
+// the read-only store, so build that plugin from a writable copy. On machines
+// with a writable SDK this does nothing.
+fun relocateReadOnlyPlugin(path: String) {
+    val plugin = project(path)
+    val source = plugin.projectDir
+    if (source.canWrite()) return
+    val target = rootDir.resolve(".gradle/readonly-plugins/${path.removePrefix(":")}")
+    if (!target.exists()) {
+        source.copyRecursively(target, overwrite = false)
+    }
+    plugin.projectDir = target
+}
+
+relocateReadOnlyPlugin(":integration_test")

@@ -50,6 +50,8 @@ void main() {
     expect(find.text('Desarrollo Frontend'), findsNWidgets(2));
     expect(find.text('2'), findsOneWidget);
     expect(find.text('Publicar Proyecto'), findsOneWidget);
+    expect(find.byKey(const Key('create_title')), findsOneWidget);
+    expect(find.byKey(const Key('create_submit')), findsOneWidget);
   });
 
   testWidgets('adds a role and submits the entered project', (tester) async {
@@ -57,24 +59,24 @@ void main() {
     addTearDown(() => tester.binding.setSurfaceSize(null));
     await tester.pumpWidget(buildSubject());
 
-    final roleField = find.widgetWithText(TextField, 'Nombre del rol');
+    final roleField = find.byKey(const Key('create_role_input'));
     await tester.enterText(roleField, ' QA ');
-    final roleRow = find.ancestor(
-      of: find.byType(TextField),
-      matching: find.byType(Row),
-    ).first;
-    final addRoleButton =
-        find.descendant(of: roleRow, matching: find.byIcon(Icons.add));
+    final addRoleButton = find.byKey(const Key('create_role_add'));
     await tester.ensureVisible(addRoleButton);
     await tester.tap(addRoleButton);
     await tester.pump();
 
     expect(find.text('QA'), findsOneWidget);
 
-    final formFields = find.byType(TextFormField);
-    await tester.enterText(formFields.at(0), 'Proyecto de prueba');
-    await tester.enterText(formFields.at(1), 'Descripción de prueba');
-    final submitButton = find.byType(ElevatedButton);
+    await tester.enterText(
+      find.byKey(const Key('create_title')),
+      'Proyecto de prueba',
+    );
+    await tester.enterText(
+      find.byKey(const Key('create_description')),
+      'Descripción de prueba',
+    );
+    final submitButton = find.byKey(const Key('create_submit'));
     await tester.scrollUntilVisible(submitButton, 500,
         scrollable: find.byType(Scrollable).first);
     await tester.pumpAndSettle();
@@ -91,7 +93,7 @@ void main() {
     addTearDown(() => tester.binding.setSurfaceSize(null));
     await tester.pumpWidget(buildSubject());
 
-    final submitButton = find.byType(ElevatedButton);
+    final submitButton = find.byKey(const Key('create_submit'));
     await tester.scrollUntilVisible(submitButton, 500,
         scrollable: find.byType(Scrollable).first);
     await tester.pumpAndSettle();

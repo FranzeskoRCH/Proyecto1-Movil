@@ -14,15 +14,17 @@ class _FakeAuthRepository implements IAuthRepository {
   bool get isLoggedIn => currentUser != null;
 
   @override
-  Future<UserSession> login({required String email, required String password})
-      async => UserSession(userId: 'test-user', email: email, name: 'Test');
+  Future<UserSession> login(
+          {required String email, required String password}) async =>
+      UserSession(userId: 'test-user', email: email, name: 'Test');
 
   @override
   Future<UserSession> register({
     required String email,
     required String password,
     required String name,
-  }) async => UserSession(userId: 'test-user', email: email, name: name);
+  }) async =>
+      UserSession(userId: 'test-user', email: email, name: name);
 
   @override
   Future<void> logout() async {}
@@ -42,10 +44,22 @@ void main() {
       (tester) async {
     await tester.pumpWidget(const GetMaterialApp(home: LoginPage()));
 
-    await tester.tap(find.byType(ElevatedButton));
+    await tester.tap(find.byKey(const Key('login_submit')));
     await tester.pump();
 
     expect(find.textContaining('Ingresa tu correo'), findsOneWidget);
     expect(find.textContaining('Ingresa tu contrase'), findsOneWidget);
+  });
+
+  testWidgets('rejects an invalid email entered by key', (tester) async {
+    await tester.pumpWidget(const GetMaterialApp(home: LoginPage()));
+
+    await tester.enterText(
+        find.byKey(const Key('login_email')), 'no-es-correo');
+    await tester.enterText(find.byKey(const Key('login_password')), 'secreto');
+    await tester.tap(find.byKey(const Key('login_submit')));
+    await tester.pump();
+
+    expect(find.textContaining('Ingresa un correo válido'), findsOneWidget);
   });
 }

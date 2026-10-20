@@ -38,6 +38,7 @@ class CreateProjectPage extends StatelessWidget {
               const SizedBox(height: 12),
               _buildCard([
                 TextFormField(
+                  key: const Key('create_title'),
                   controller: controller.titleController,
                   decoration: _buildInputDecoration(
                     label: 'Título del proyecto *',
@@ -47,6 +48,7 @@ class CreateProjectPage extends StatelessWidget {
                 ),
                 const SizedBox(height: 16),
                 TextFormField(
+                  key: const Key('create_description'),
                   controller: controller.descriptionController,
                   maxLines: 2,
                   decoration: _buildInputDecoration(
@@ -57,6 +59,7 @@ class CreateProjectPage extends StatelessWidget {
                 ),
                 const SizedBox(height: 16),
                 TextFormField(
+                  key: const Key('create_vision'),
                   controller: controller.visionController,
                   maxLines: 3,
                   decoration: _buildInputDecoration(
@@ -124,6 +127,7 @@ class CreateProjectPage extends StatelessWidget {
                   children: [
                     Expanded(
                       child: TextField(
+                        key: const Key('create_role_input'),
                         controller: controller.roleInputController,
                         decoration: _buildInputDecoration(
                           label: 'Nombre del rol',
@@ -135,6 +139,7 @@ class CreateProjectPage extends StatelessWidget {
                     ),
                     const SizedBox(width: 8),
                     IconButton.filled(
+                      key: const Key('create_role_add'),
                       onPressed: () => controller
                           .addRole(controller.roleInputController.text),
                       icon: const Icon(Icons.add),
@@ -249,6 +254,7 @@ class CreateProjectPage extends StatelessWidget {
                 () => SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
+                    key: const Key('create_submit'),
                     onPressed: controller.isLoading.value
                         ? null
                         : controller.submitProject,

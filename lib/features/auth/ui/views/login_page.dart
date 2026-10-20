@@ -101,6 +101,7 @@ class _LoginPageState extends State<LoginPage> {
 
                   // Campo Email
                   TextFormField(
+                    key: const Key('login_email'),
                     controller: _emailController,
                     keyboardType: TextInputType.emailAddress,
                     decoration: InputDecoration(
@@ -139,6 +140,7 @@ class _LoginPageState extends State<LoginPage> {
 
                   // Campo Contraseña
                   TextFormField(
+                    key: const Key('login_password'),
                     controller: _passwordController,
                     obscureText: _obscurePassword,
                     decoration: InputDecoration(
@@ -188,6 +190,7 @@ class _LoginPageState extends State<LoginPage> {
                   Obx(() {
                     final isLoading = authController.isLoading;
                     return ElevatedButton(
+                      key: const Key('login_submit'),
                       onPressed: isLoading ? null : _handleLogin,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFFFF7043),

@@ -28,33 +28,43 @@ void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   testWidgets('user can complete the create-project flow', (tester) async {
-    await tester.binding.setSurfaceSize(const Size(800, 1200));
-    addTearDown(() => tester.binding.setSurfaceSize(null));
     final repository = _IntegrationCreateRepository();
     final controller = CreateProjectController(repository)..onInit();
     Get.put<CreateProjectController>(controller);
+    addTearDown(() {
+      controller.onClose();
+      Get.reset();
+    });
 
     await tester.pumpWidget(
       const GetMaterialApp(home: CreateProjectPage()),
     );
+    await tester.pumpAndSettle();
 
-    final formFields = find.byType(TextFormField);
-    await tester.enterText(formFields.at(0), 'Flujo integrado');
     await tester.enterText(
-      formFields.at(1),
+      find.byKey(const Key('create_title')),
+      'Flujo integrado',
+    );
+    await tester.enterText(
+      find.byKey(const Key('create_description')),
       'Proyecto creado en una prueba aislada',
     );
-    final submitButton = find.byType(ElevatedButton);
-    await tester.scrollUntilVisible(submitButton, 500,
-        scrollable: find.byType(Scrollable).first);
+    await tester.testTextInput.receiveAction(TextInputAction.done);
+    FocusManager.instance.primaryFocus?.unfocus();
+    await tester.pumpAndSettle();
+
+    final submitButton = find.byKey(const Key('create_submit'));
+    await tester.scrollUntilVisible(
+      submitButton,
+      400,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.ensureVisible(submitButton);
     await tester.pumpAndSettle();
     await tester.tap(submitButton);
     await tester.pumpAndSettle();
 
     expect(repository.created, isTrue);
     expect(controller.titleController.text, isEmpty);
-
-    controller.onClose();
-    Get.reset();
   });
 }

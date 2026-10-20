@@ -46,3 +46,14 @@ app.*.map.json
 
 # Widget Preview related
 .widget_preview/
+
+# Local Android SDK / platform-tools copies (never commit these)
+/.android-sdk/
+/platform-tools/
+/*.exe
+/*.dll
+/NOTICE.txt
+/mke2fs.conf
+/source.properties
+/android/build/
+

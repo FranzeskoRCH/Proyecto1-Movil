@@ -64,6 +64,12 @@
             export ANDROID_SDK_ROOT="${androidSdk}/libexec/android-sdk"
             export JAVA_HOME="${pkgs.jdk17}"
 
+            # Flutter only looks for google-chrome; point it at the system
+            # Chromium so `flutter run -d chrome` works.
+            if command -v chromium >/dev/null 2>&1; then
+              export CHROME_EXECUTABLE="$(command -v chromium)"
+            fi
+
             flutter config --android-sdk "$ANDROID_HOME" > /dev/null 2>&1
           '';
         };

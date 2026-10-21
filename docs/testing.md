@@ -35,7 +35,7 @@ test/
   widget/          # formularios, validación y navegación
   features/        # controladores y fuentes por funcionalidad
   core/            # enlaces para compartir proyectos
-integration_test/  # flujo de creación con repositorio aislado
+integration_test/  # login, creación y creación→lista, con fakes en memoria
 .github/workflows/
   flutter-tests.yml       # análisis + unitarias/widget en cada push
   integration-tests.yml   # integración en emulador (manual)
@@ -43,7 +43,7 @@ integration_test/  # flujo de creación con repositorio aislado
 
 ## Ejecución local
 
-Desde la raíz del proyecto:
+Desde la raíz del proyecto, pruebas unitarias y de widgets:
 
 ```bash
 nix develop --command flutter pub get
@@ -51,19 +51,29 @@ nix develop --command flutter analyze
 nix develop --command flutter test
 nix develop --command flutter test test/unit/
 nix develop --command flutter test test/widget/
-nix develop --command flutter test integration_test/app_test.dart -d <dispositivo>
 ```
 
-La prueba de integración requiere un dispositivo o emulador compatible
-(Android o iOS). Para un teléfono Android conectado por USB:
+Solo las pruebas de integración (requieren un dispositivo o emulador
+Android/iOS; `flutter test` no las ejecuta):
 
 ```bash
 adb devices
+nix develop --command flutter test integration_test/login_flow_test.dart -d <serial>
+nix develop --command flutter test integration_test/create_list_flow_test.dart -d <serial>
 nix develop --command flutter test integration_test/app_test.dart -d <serial>
 ```
 
-La prueba usa el tamaño real de la pantalla del dispositivo: no fija
-`setSurfaceSize`, desplaza el formulario hasta el botón y lo pulsa con una
+Cada archivo se compila e instala como una app de prueba con el mismo
+`applicationId`, así que reemplaza la versión de depuración instalada. Para
+recuperar la app normal al terminar:
+
+```bash
+nix develop --command flutter build apk --debug
+adb install -r build/app/outputs/flutter-apk/app-debug.apk
+```
+
+Las pruebas usan el tamaño real de la pantalla del dispositivo: no fijan
+`setSurfaceSize`, desplazan el formulario hasta el botón y lo pulsan con una
 llave estable (`create_submit`).
 
 ## CI
@@ -107,6 +117,10 @@ para unidades puras; `testWidgets` y `WidgetTester` para renderizado e
 interacciones; y `IntegrationTestWidgetsFlutterBinding` solo para recorridos
 que combinen varias capas.
 
+Las pruebas de integración comparten las dependencias falsas de
+`integration_test/test_dependencies.dart`: regístrelas en GetX y monte
+`MainShell` (o la página objetivo) sin tocar Roble ni la red.
+
 Los widgets que se prueban exponen llaves estables y las pruebas los buscan con
 `find.byKey` en lugar de por tipo o posición:
 
@@ -121,6 +135,7 @@ Mantenga una dependencia falsa por prueba, limpie controladores GetX
 
 - `flutter analyze`: correcto, sin issues.
 - 54 pruebas unitarias + 6 de widgets: 60/60 correctas.
-- Integración: 1/1 correcta en un teléfono Android real (verificado con
-  `flutter test integration_test/app_test.dart -d <serial>`).
+- Integración: 3/3 correctas en un teléfono Android real (creación, login y
+  creación→lista, verificadas con
+  `flutter test integration_test/<archivo>.dart -d <serial>`).
 - CI principal: verde.

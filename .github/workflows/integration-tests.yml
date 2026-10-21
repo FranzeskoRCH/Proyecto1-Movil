@@ -32,6 +32,15 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
+      # android/gradle.properties sets android.builder.sdkDownload=false, so the
+      # runner must already have what the native plugins ask for.
+      - name: Install Android SDK components
+        run: |
+          SDK="${ANDROID_HOME:-/usr/local/lib/android/sdk}"
+          SDKMANAGER="$SDK/cmdline-tools/latest/bin/sdkmanager"
+          yes | "$SDKMANAGER" --licenses > /dev/null || true
+          "$SDKMANAGER" "cmake;3.22.1" "ndk;28.2.13676358"
+
       - name: Run integration test on emulator
         uses: ReactiveCircus/android-emulator-runner@v2
         with:

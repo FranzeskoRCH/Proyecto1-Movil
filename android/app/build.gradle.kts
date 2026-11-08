@@ -33,9 +33,26 @@ android {
         versionName = flutter.versionName
     }
 
+    // Firma de release: lee el keystore de las variables de entorno que
+    // inyecta el workflow (.github/workflows/release.yml). Si no hay
+    // keystore, cae en la debug key (el build sirve, pero no actualiza
+    // instalaciones previas).
+    val keystoreFile = System.getenv("ANDROID_KEYSTORE_FILE")
+    signingConfigs {
+        if (!keystoreFile.isNullOrEmpty()) {
+            create("release") {
+                storeFile = file(keystoreFile)
+                storePassword = System.getenv("ANDROID_KEYSTORE_PASSWORD")
+                keyAlias = System.getenv("ANDROID_KEY_ALIAS")
+                keyPassword = System.getenv("ANDROID_KEY_PASSWORD")
+            }
+        }
+    }
+
     buildTypes {
         release {
-            signingConfig = signingConfigs.getByName("debug")
+            signingConfig = signingConfigs.findByName("release")
+                ?: signingConfigs.getByName("debug")
         }
     }
 }

@@ -1,0 +1,85 @@
+name: Release APK
+
+# CI/CD completo para la presentación: cada push a main (o corrida manual)
+# analiza, prueba, compila el APK firmado y lo publica como GitHub Release
+# con notas generadas automáticamente de los commits.
+#
+# Secrets necesarios (Settings > Secrets and variables > Actions):
+#   ANDROID_KEYSTORE_BASE64, ANDROID_KEYSTORE_PASSWORD,
+#   ANDROID_KEY_ALIAS, ANDROID_KEY_PASSWORD
+# Sin ellos el build sigue pero firma con debug key: el APK no puede
+# actualizarse sobre uno ya instalado.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  # 1.0.<run_number>: único y siempre creciente, Android lo exige para
+  # aceptar un build como actualización de otro.
+  VERSION: 1.0.${{ github.run_number }}
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.47.0'
+          channel: stable
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Install Android SDK components
+        # android/gradle.properties pone android.builder.sdkDownload=false,
+        # así que el runner debe instalar lo que pidan los plugins nativos.
+        run: |
+          SDK="${ANDROID_HOME:-/usr/local/lib/android/sdk}"
+          SDKMANAGER="$SDK/cmdline-tools/latest/bin/sdkmanager"
+          yes | "$SDKMANAGER" --licenses > /dev/null || true
+          "$SDKMANAGER" "cmake;3.22.1" "ndk;28.2.13676358"
+
+      - name: Set up signing
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+        run: |
+          if [ -n "$ANDROID_KEYSTORE_BASE64" ]; then
+            echo "$ANDROID_KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/release.jks"
+            echo "ANDROID_KEYSTORE_FILE=$RUNNER_TEMP/release.jks" >> "$GITHUB_ENV"
+          else
+            echo "::warning::No hay secreto ANDROID_KEYSTORE_BASE64: se firma con debug key, este APK no puede actualizar uno ya instalado."
+          fi
+
+      - name: Analyze
+        run: flutter analyze
+
+      - name: Run unit and widget tests
+        run: flutter test
+
+      - name: Build the signed APK
+        env:
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          BUILD_NUMBER: ${{ github.run_number }}
+        run: flutter build apk --release --build-name "$VERSION" --build-number "$BUILD_NUMBER"
+
+      - name: Publish the release (notas automáticas de los commits)
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ env.VERSION }}
+          name: v${{ env.VERSION }}
+          files: build/app/outputs/flutter-apk/app-release.apk
+          generate_release_notes: true

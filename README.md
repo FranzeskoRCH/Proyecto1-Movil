@@ -7,3 +7,5 @@
 - Francesco Rosa - @FranzeskoRCH
 
 Figma: https://www.figma.com/design/kzlWc4SxUTsPEmwCHRlkVo/Flujos?node-id=2604-213
+
+Video Presentación Grupo 11 (Jose Ballestas y Francesco Rosa): https://youtu.be/ui5YjzWmwX0
